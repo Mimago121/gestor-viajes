@@ -1,0 +1,7 @@
+.navbar-brand {
+  font-weight: bold;
+}
+
+.nav-link.active {
+  text-decoration: underline;
+}

@@ -1,6 +1,12 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
+import 'zone.js';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // 👈 habilita el JS de Bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import { AppComponent } from './app/app';
+import { routes } from './app/app.routes';
+
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+}).catch(err => console.error(err));
