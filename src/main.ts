@@ -1,12 +1,13 @@
 import 'zone.js';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // 👈 habilita el JS de Bootstrap
+// Tus imports de Bootstrap (están bien, déjalos)
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app';
-import { routes } from './app/app.routes';
+// IMPORTANTE: Importamos la configuración que creamos antes
+import { appConfig } from './app/app.config'; 
 
-bootstrapApplication(AppComponent, {
-  providers: [provideRouter(routes)]
-}).catch(err => console.error(err));
+// Le pasamos appConfig aquí para que cargue Firebase y las rutas
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));
