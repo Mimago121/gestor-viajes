@@ -1,7 +1,7 @@
-<app-navbar></app-navbar>
+<app-navbar *ngIf="shouldShowMenu()"></app-navbar>
 
-<main class="container mt-4">
+<div class="main-container">
   <router-outlet></router-outlet>
-</main>
+</div>
 
-<app-footer></app-footer>
+<app-footer *ngIf="shouldShowMenu()"></app-footer>
