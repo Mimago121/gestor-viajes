@@ -1,17 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Necesario para *ngIf y *ngFor
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Trip } from '../../interfaces/Trip';
 import { MemberMini } from '../../interfaces/MemberMini';
 
+// --- Imports de Firebase ---
+import { Firestore, collection, addDoc, query, orderBy, onSnapshot, Timestamp } from '@angular/fire/firestore';
+import { AuthService } from '../../services/auth.service';
+import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-trips-page',
-  templateUrl: './trips-page.component.html',
-  styleUrls: ['./trips-page.component.css'], // opcional si ya tenéis css
+  standalone: true, // ¡Importante!
+  imports: [CommonModule, ReactiveFormsModule], // ¡Importante!
+  templateUrl: './trips.html',
+  styleUrls: ['./trips.css'],
 })
 export class TripsComponent implements OnInit {
+  
+  // Inyecciones de dependencias
+  private fb = inject(FormBuilder);
+  private firestore = inject(Firestore);
+  private authService = inject(AuthService);
+
   trips: Trip[] = [];
-  loading = false;
+  loading = true; // Empezamos cargando
   errorMsg = '';
 
   isCreateOpen = false;
@@ -19,20 +32,15 @@ export class TripsComponent implements OnInit {
 
   tripForm!: FormGroup;
 
-  // Simulamos usuario logueado (en vuestra app vendrá de AuthService)
-  currentUser: MemberMini = {
-    id: 'u1',
-    name: 'Tú',
-    avatarUrl: 'https://i.pravatar.cc/100?img=3',
-  };
+  // Usuario actual (datos reales de Firebase Auth)
+  currentUser: MemberMini | null = null;
 
   // Imagen placeholder (si no hay)
   readonly fallbackImg =
     'https://images.unsplash.com/photo-1526481280695-3c687fd5432c?q=80&w=1200&auto=format&fit=crop';
 
-  constructor(private fb: FormBuilder) {}
-
   ngOnInit(): void {
+    // 1. Inicializar formulario
     this.tripForm = this.fb.group(
       {
         name: ['', [Validators.required, Validators.minLength(3)]],
@@ -45,7 +53,21 @@ export class TripsComponent implements OnInit {
       { validators: [this.dateRangeValidator, this.originDestinationValidator] }
     );
 
-    this.loadTrips();
+    // 2. Obtener usuario real y luego cargar viajes
+    this.authService.user$.subscribe((user: User | null) => {
+      if (user) {
+        // Construimos el objeto MemberMini con datos reales
+        this.currentUser = {
+          id: user.uid,
+          name: user.displayName || user.email?.split('@')[0] || 'Viajero',
+          avatarUrl: user.photoURL || 'https://i.pravatar.cc/150?img=12'
+        };
+        // Una vez tenemos usuario, cargamos los viajes
+        this.loadTripsRealtime();
+      } else {
+        this.currentUser = null;
+      }
+    });
   }
 
   // ---------- UI actions ----------
@@ -60,45 +82,42 @@ export class TripsComponent implements OnInit {
     this.isCreateOpen = false;
   }
 
-  // Click fuera del modal
   onOverlayClick(evt: MouseEvent): void {
-    // Si el click es en el overlay (no dentro del modal), cerramos
     const target = evt.target as HTMLElement;
     if (target.classList.contains('modal-overlay')) {
       this.closeCreate();
     }
   }
 
-  // ---------- Data ----------
-  loadTrips(): void {
+  // ---------- Data (Firebase) ----------
+  
+  loadTripsRealtime(): void {
     this.loading = true;
-    this.errorMsg = '';
+    
+    // Referencia a la colección 'trips'
+    const tripsRef = collection(this.firestore, 'trips');
+    
+    // Query: Ordenados por fecha de creación (más nuevos primero)
+    const q = query(tripsRef, orderBy('createdAt', 'desc'));
 
-    // MVP: mock local (luego esto se conecta a un TripsService real)
-    setTimeout(() => {
-      this.trips = [
-        {
-          id: 't1',
-          name: 'Roma 2026',
-          origin: 'Madrid',
-          destination: 'Roma',
-          startDate: '2026-03-12',
-          endDate: '2026-03-16',
-          imageUrl:
-            'https://images.unsplash.com/photo-1525874684015-58379d421a52?q=80&w=1200&auto=format&fit=crop',
-          members: [
-            this.currentUser,
-            { id: 'u2', name: 'Ana', avatarUrl: 'https://i.pravatar.cc/100?img=5' },
-            { id: 'u3', name: 'Luis', avatarUrl: 'https://i.pravatar.cc/100?img=8' },
-          ],
-          createdAt: Date.now() - 100000,
-        },
-      ];
+    // onSnapshot escucha cambios en tiempo real
+    onSnapshot(q, (snapshot) => {
+      this.trips = snapshot.docs.map(doc => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id, // El ID viene del documento, no de la data
+          ...data
+        } as Trip;
+      });
       this.loading = false;
-    }, 500);
+    }, (error) => {
+      console.error("Error cargando viajes:", error);
+      this.errorMsg = 'Error al cargar los viajes.';
+      this.loading = false;
+    });
   }
 
-  createTrip(): void {
+  async createTrip(): Promise<void> {
     this.errorMsg = '';
 
     if (this.tripForm.invalid) {
@@ -106,29 +125,42 @@ export class TripsComponent implements OnInit {
       return;
     }
 
-    this.submitting = true;
+    if (!this.currentUser) {
+      this.errorMsg = 'No estás autenticado.';
+      return;
+    }
 
+    this.submitting = true;
     const v = this.tripForm.value;
 
-    // Creamos el trip (en real: lo hace un servicio y devuelve el trip ya creado)
-    const newTrip: Trip = {
-      id: crypto?.randomUUID ? crypto.randomUUID() : `t_${Date.now()}`,
-      name: v.name.trim(),
-      origin: v.origin.trim(),
-      destination: v.destination.trim(),
-      startDate: v.startDate,
-      endDate: v.endDate,
-      imageUrl: v.imageUrl?.trim() || undefined,
-      members: [this.currentUser],
-      createdAt: Date.now(),
-    };
+    try {
+      // Objeto a guardar en Firestore
+      // Nota: No ponemos 'id' aquí, Firestore lo genera solo
+      const newTripData = {
+        name: v.name.trim(),
+        origin: v.origin.trim(),
+        destination: v.destination.trim(),
+        startDate: v.startDate,
+        endDate: v.endDate,
+        imageUrl: v.imageUrl?.trim() || null,
+        members: [this.currentUser], // Añadimos al creador como primer miembro
+        createdAt: Date.now(), // Guardamos timestamp numérico para ordenar fácil
+      };
 
-    // Simula request
-    setTimeout(() => {
-      this.trips = [newTrip, ...this.trips];
+      // Guardar en Firebase
+      const tripsRef = collection(this.firestore, 'trips');
+      await addDoc(tripsRef, newTripData);
+
+      // Éxito
       this.submitting = false;
       this.isCreateOpen = false;
-    }, 500);
+      this.tripForm.reset();
+
+    } catch (error) {
+      console.error("Error creando viaje:", error);
+      this.errorMsg = 'Error al guardar en la nube.';
+      this.submitting = false;
+    }
   }
 
   // ---------- Helpers ----------
@@ -137,24 +169,23 @@ export class TripsComponent implements OnInit {
   }
 
   formatDateRange(startIso: string, endIso: string): string {
-    // formato simple dd/mm/yyyy - dd/mm/yyyy
     const s = this.formatIsoDate(startIso);
     const e = this.formatIsoDate(endIso);
     return `${s} - ${e}`;
   }
 
   private formatIsoDate(iso: string): string {
-    // iso: yyyy-mm-dd
+    if (!iso) return '';
     const [y, m, d] = iso.split('-');
     return `${d}/${m}/${y}`;
   }
 
   visibleMembers(trip: Trip): MemberMini[] {
-    return trip.members.slice(0, 3);
+    return trip.members ? trip.members.slice(0, 3) : [];
   }
 
   extraMembersCount(trip: Trip): number {
-    return Math.max(0, trip.members.length - 3);
+    return trip.members ? Math.max(0, trip.members.length - 3) : 0;
   }
 
   // ---------- Validators ----------

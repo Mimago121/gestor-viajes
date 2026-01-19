@@ -1,0 +1,99 @@
+.profile-container {
+  max-width: 420px;
+  margin: auto;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.8rem;
+  border: 3px solid #4f46e5;
+}
+
+.username {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.bio {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+}
+
+.stat {
+  width: 80px;
+  height: 80px;
+  background-color: #4f46e5;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+.stat strong {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.stat span {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.next-trip {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.next-trip h3 {
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.7rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.primary {
+  background: #4f46e5;
+  color: white;
+}
+
+.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
