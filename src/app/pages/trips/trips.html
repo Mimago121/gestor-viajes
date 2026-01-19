@@ -1,1 +1,137 @@
-<p>trips works!</p>
+<div class="page">
+  <div class="header">
+    <div>
+      <h1>Mis viajes</h1>
+      <p class="subtitle">Crea un viaje y organiza el plan con tu grupo.</p>
+    </div>
+
+    <button class="btn primary" (click)="openCreate()">+ Crear viaje</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="info">Cargando viajes...</div>
+
+  <!-- Error -->
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && trips.length === 0" class="empty">
+    <h3>No tienes viajes todavía</h3>
+    <p>Crea tu primer viaje para empezar a organizarlo.</p>
+    <button class="btn primary" (click)="openCreate()">Crear viaje</button>
+  </div>
+
+  <!-- Trips grid -->
+  <div class="grid" *ngIf="!loading && trips.length > 0">
+    <div class="trip-card" *ngFor="let trip of trips">
+      <img class="trip-img" [src]="getTripImage(trip)" alt="Imagen del destino" />
+
+      <div class="trip-body">
+        <div class="trip-title">
+          <h3>{{ trip.destination }}</h3>
+          <span class="trip-dates">{{ formatDateRange(trip.startDate, trip.endDate) }}</span>
+        </div>
+
+        <div class="trip-sub">
+          <span class="pill">Origen: {{ trip.origin }}</span>
+          <span class="pill">Nombre: {{ trip.name }}</span>
+        </div>
+
+        <div class="members">
+          <div class="avatars">
+            <img
+              class="avatar"
+              *ngFor="let m of visibleMembers(trip)"
+              [src]="m.avatarUrl || 'https://i.pravatar.cc/100?u=' + m.id"
+              [alt]="m.name"
+              [title]="m.name"
+            />
+            <span class="more" *ngIf="extraMembersCount(trip) > 0">
+              +{{ extraMembersCount(trip) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <!-- en el futuro: navegar a detalle /trip/:id -->
+          <button class="btn ghost" type="button">Ver detalle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal crear viaje -->
+<div
+  class="modal-overlay"
+  *ngIf="isCreateOpen"
+  (click)="onOverlayClick($event)"
+>
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Crear viaje</h2>
+      <button class="icon-btn" (click)="closeCreate()" [disabled]="submitting">✕</button>
+    </div>
+
+    <form [formGroup]="tripForm" (ngSubmit)="createTrip()" class="form">
+      <div class="row">
+        <label>Nombre</label>
+        <input type="text" formControlName="name" placeholder="Ej: Roma 2026" />
+        <div class="field-error" *ngIf="tripForm.get('name')?.touched && tripForm.get('name')?.invalid">
+          <span *ngIf="tripForm.get('name')?.errors?.['required']">El nombre es obligatorio.</span>
+          <span *ngIf="tripForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</span>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>Origen</label>
+          <input type="text" formControlName="origin" placeholder="Ej: Madrid" />
+          <div class="field-error" *ngIf="tripForm.get('origin')?.touched && tripForm.get('origin')?.invalid">
+            <span *ngIf="tripForm.get('origin')?.errors?.['required']">El origen es obligatorio.</span>
+          </div>
+        </div>
+
+        <div>
+          <label>Destino</label>
+          <input type="text" formControlName="destination" placeholder="Ej: Roma" />
+          <div class="field-error" *ngIf="tripForm.get('destination')?.touched && tripForm.get('destination')?.invalid">
+            <span *ngIf="tripForm.get('destination')?.errors?.['required']">El destino es obligatorio.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-error" *ngIf="tripForm.touched && tripForm.errors?.['samePlace']">
+        Origen y destino no pueden ser iguales.
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>Fecha inicio</label>
+          <input type="date" formControlName="startDate" />
+        </div>
+
+        <div>
+          <label>Fecha fin</label>
+          <input type="date" formControlName="endDate" />
+        </div>
+      </div>
+
+      <div class="field-error" *ngIf="tripForm.touched && tripForm.errors?.['dateRange']">
+        La fecha fin no puede ser anterior a la fecha inicio.
+      </div>
+
+      <div class="row">
+        <label>Imagen (URL opcional)</label>
+        <input type="url" formControlName="imageUrl" placeholder="https://..." />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" type="button" (click)="closeCreate()" [disabled]="submitting">Cancelar</button>
+        <button class="btn primary" type="submit" [disabled]="submitting">
+          {{ submitting ? 'Creando...' : 'Crear viaje' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
