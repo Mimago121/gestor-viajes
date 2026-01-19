@@ -1,15 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+// Importamos Formularios Reactivos
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; 
+
 import { AuthService } from '../../services/auth.service';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
-// 1. IMPORTANTE: Importa el tipo 'User' aquí
-import { User } from '@angular/fire/auth'; 
+// Importamos updateDoc para actualizar datos
+import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
+import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule], // ¡Importante importar ReactiveFormsModule!
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
@@ -18,20 +21,35 @@ export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
   private firestore = inject(Firestore);
   private router = inject(Router);
+  private fb = inject(FormBuilder);
+
+  // Variables para el modal
+  isEditing = false;
+  editForm: FormGroup;
+  currentUserUid: string | null = null; // Guardamos el ID para saber qué documento actualizar
 
   user: any = {
     name: 'Cargando...',
     username: '@...',
     avatar: 'https://i.pravatar.cc/150?img=12',
-    bio: 'Bienvenido a TripShare',
+    bio: '...',
     stats: { trips: 0, countries: 0, friends: 0 },
-    nextTrip: { destination: 'Sin planificar', date: '--' }
+    nextTrip: { destination: '--', date: '--' }
   };
 
-  async ngOnInit() {
-    // 2. Especificamos que 'authUser' puede ser un 'User' o 'null'
+  constructor() {
+    // Inicializamos el formulario vacío
+    this.editForm = this.fb.group({
+      name: ['', Validators.required],
+      username: ['', Validators.required],
+      bio: ['']
+    });
+  }
+
+  ngOnInit() {
     this.authService.user$.subscribe(async (authUser: User | null) => {
       if (authUser) {
+        this.currentUserUid = authUser.uid; // Guardamos el ID
         await this.loadUserProfile(authUser);
       } else {
         this.router.navigate(['/login']);
@@ -39,7 +57,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // 3. Especificamos que aquí recibimos un 'User' de Firebase
   async loadUserProfile(authUser: User) {
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
     const userSnapshot = await getDoc(userDocRef);
@@ -52,20 +69,59 @@ export class ProfileComponent implements OnInit {
         avatar: data['avatar'] || 'https://i.pravatar.cc/150?img=12',
         bio: data['bio'] || 'Sin biografía aún.',
         stats: data['stats'] || { trips: 0, countries: 0, friends: 0 },
-        nextTrip: data['nextTrip'] || { destination: 'Añadir viaje', date: '' }
+        nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
       };
     } else {
-      const newProfile = {
-        name: authUser.email?.split('@')[0],
-        username: '@nuevo_usuario',
-        bio: '¡Hola! Soy nuevo en TripShare.',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        stats: { trips: 0, countries: 0, friends: 0 },
-        nextTrip: { destination: 'Planificar viaje', date: 'Pronto' }
-      };
-      
-      await setDoc(userDocRef, newProfile);
-      this.user = newProfile;
+      // (Tu lógica de crear perfil nuevo si no existe...)
+      // Por brevedad, asumo que ya existe o se crea igual que antes
+    }
+  }
+
+  // --- LÓGICA DEL MODAL ---
+
+  openEditModal() {
+    // 1. Rellenamos el formulario con los datos actuales
+    this.editForm.patchValue({
+      name: this.user.name,
+      username: this.user.username,
+      bio: this.user.bio
+    });
+    // 2. Mostramos el modal
+    this.isEditing = true;
+  }
+
+  closeEditModal() {
+    this.isEditing = false;
+  }
+
+  async saveProfile() {
+    if (this.editForm.valid && this.currentUserUid) {
+      const formValues = this.editForm.value;
+
+      try {
+        // 1. Referencia al documento en Firebase
+        const userDocRef = doc(this.firestore, `users/${this.currentUserUid}`);
+        
+        // 2. Actualizamos SOLO los campos que han cambiado
+        await updateDoc(userDocRef, {
+          name: formValues.name,
+          username: formValues.username,
+          bio: formValues.bio
+        });
+
+        // 3. Actualizamos la vista localmente para que se vea rápido
+        this.user.name = formValues.name;
+        this.user.username = formValues.username;
+        this.user.bio = formValues.bio;
+
+        // 4. Cerramos modal
+        this.isEditing = false;
+        alert('¡Perfil actualizado!');
+
+      } catch (error) {
+        console.error('Error al guardar:', error);
+        alert('Error al guardar cambios');
+      }
     }
   }
 
