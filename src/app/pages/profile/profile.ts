@@ -72,9 +72,24 @@ export class ProfileComponent implements OnInit {
         nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
       };
     } else {
-      // (Tu lógica de crear perfil nuevo si no existe...)
-      // Por brevedad, asumo que ya existe o se crea igual que antes
-    }
+  // SI NO EXISTE (Es nuevo):
+  const newProfile = {
+    name: authUser.email?.split('@')[0],
+    username: '@nuevo_usuario',
+    bio: '¡Hola! Soy nuevo en TripShare.',
+    
+    // --- CAMBIO AQUÍ ---
+    // En lugar de la URL de internet, pon la ruta de tu carpeta assets
+    avatar: 'assets/images/user-default.png', 
+    // (Asegúrate que el nombre del archivo coincida con el que guardaste)
+
+    stats: { trips: 0, countries: 0, friends: 0 },
+    nextTrip: { destination: 'Planificar viaje', date: 'Pronto' }
+  };
+  
+  await setDoc(userDocRef, newProfile);
+  this.user = newProfile;
+}
   }
 
   // --- LÓGICA DEL MODAL ---
