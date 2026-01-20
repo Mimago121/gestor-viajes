@@ -1,0 +1,167 @@
+/* =========================================
+   1. ESTRUCTURA PRINCIPAL (Igual al Login)
+   ========================================= */
+
+/* Fondo degradado */
+.login-background {
+  /* height: 100vh;  <-- BORRA ESTO */
+  min-height: 100vh; /* <-- PON ESTO: Permite que crezca */
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #007adf 0%, #00ecbc 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px; /* <-- AÑADE ESTO: Para dar aire arriba y abajo en móviles */
+  box-sizing: border-box; /* Asegura que el padding no descuadre el ancho */
+}
+
+/* Tarjeta blanca flotante */
+.login-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+
+  /* BORRA O COMENTA ESTAS LÍNEAS DE ABAJO PARA QUITAR LA BARRA */
+  /* max-height: 90vh; */
+  /* overflow-y: auto; */
+}
+
+/* Títulos */
+.brand-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.slogan {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+/* =========================================
+   2. INPUTS Y BOTONES
+   ========================================= */
+
+.input-group {
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  border-color: #007adf;
+}
+
+/* Botones */
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-primary {
+  background-color: #007adf;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #005bb5;
+}
+
+.btn-primary:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.divider {
+  color: #aaa;
+  font-size: 0.8rem;
+  margin: 5px 0;
+}
+
+/* Enlace "Volver al login" */
+.btn-secondary {
+  display: block;
+  background-color: transparent;
+  color: #007adf;
+  border: 2px solid #007adf;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background-color: #f0f8ff;
+}
+
+/* =========================================
+   3. ESTILOS DE AYUDA Y ERROR (Nuevos)
+   ========================================= */
+
+/* Texto de sugerencia (gris pequeño) */
+.hint-text {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 5px;
+  margin-bottom: 2px;
+  font-style: italic;
+}
+
+/* Texto de error (rojo) */
+.error-msg {
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

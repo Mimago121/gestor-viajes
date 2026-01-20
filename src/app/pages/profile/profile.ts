@@ -1,55 +1,53 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-// Importamos Formularios Reactivos
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; 
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AuthService } from '../../services/auth.service';
-// Importamos updateDoc para actualizar datos
 import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // ¡Importante importar ReactiveFormsModule!
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.css']
+  styleUrls: ['./profile.css'],
 })
 export class ProfileComponent implements OnInit {
-  
   private authService = inject(AuthService);
   private firestore = inject(Firestore);
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  // Variables para el modal
   isEditing = false;
   editForm: FormGroup;
-  currentUserUid: string | null = null; // Guardamos el ID para saber qué documento actualizar
+  currentUserUid: string | null = null;
+
+  // URL FIJA QUE SIEMPRE FUNCIONA
+  readonly defaultAvatar = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   user: any = {
     name: 'Cargando...',
     username: '@...',
-    avatar: 'https://i.pravatar.cc/150?img=12',
+    avatar: this.defaultAvatar, // <--- Aquí
     bio: '...',
     stats: { trips: 0, countries: 0, friends: 0 },
-    nextTrip: { destination: '--', date: '--' }
+    nextTrip: { destination: '--', date: '--' },
   };
 
   constructor() {
-    // Inicializamos el formulario vacío
     this.editForm = this.fb.group({
       name: ['', Validators.required],
       username: ['', Validators.required],
-      bio: ['']
+      bio: [''],
     });
   }
 
   ngOnInit() {
     this.authService.user$.subscribe(async (authUser: User | null) => {
       if (authUser) {
-        this.currentUserUid = authUser.uid; // Guardamos el ID
+        this.currentUserUid = authUser.uid;
         await this.loadUserProfile(authUser);
       } else {
         this.router.navigate(['/login']);
@@ -66,42 +64,35 @@ export class ProfileComponent implements OnInit {
       this.user = {
         name: data['name'] || authUser.email?.split('@')[0],
         username: data['username'] || '@viajero',
-        avatar: data['avatar'] || 'https://i.pravatar.cc/150?img=12',
+        // Si no tiene foto guardada, usa la URL fija
+        avatar: data['avatar'] || this.defaultAvatar, 
         bio: data['bio'] || 'Sin biografía aún.',
         stats: data['stats'] || { trips: 0, countries: 0, friends: 0 },
-        nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
+        nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' },
       };
     } else {
-  // SI NO EXISTE (Es nuevo):
-  const newProfile = {
-    name: authUser.email?.split('@')[0],
-    username: '@nuevo_usuario',
-    bio: '¡Hola! Soy nuevo en TripShare.',
-    
-    // --- CAMBIO AQUÍ ---
-    // En lugar de la URL de internet, pon la ruta de tu carpeta assets
-    avatar: 'assets/images/user-default.png', 
-    // (Asegúrate que el nombre del archivo coincida con el que guardaste)
+      // USUARIO NUEVO
+      const newProfile = {
+        name: authUser.email?.split('@')[0],
+        username: '@nuevo_usuario',
+        bio: '¡Hola! Soy nuevo en TripShare.',
+        // Guardamos la URL fija en la base de datos
+        avatar: this.defaultAvatar, 
+        stats: { trips: 0, countries: 0, friends: 0 },
+        nextTrip: { destination: 'Planificar viaje', date: 'Pronto' },
+      };
 
-    stats: { trips: 0, countries: 0, friends: 0 },
-    nextTrip: { destination: 'Planificar viaje', date: 'Pronto' }
-  };
-  
-  await setDoc(userDocRef, newProfile);
-  this.user = newProfile;
-}
+      await setDoc(userDocRef, newProfile);
+      this.user = newProfile;
+    }
   }
 
-  // --- LÓGICA DEL MODAL ---
-
   openEditModal() {
-    // 1. Rellenamos el formulario con los datos actuales
     this.editForm.patchValue({
       name: this.user.name,
       username: this.user.username,
-      bio: this.user.bio
+      bio: this.user.bio,
     });
-    // 2. Mostramos el modal
     this.isEditing = true;
   }
 
@@ -112,30 +103,20 @@ export class ProfileComponent implements OnInit {
   async saveProfile() {
     if (this.editForm.valid && this.currentUserUid) {
       const formValues = this.editForm.value;
-
       try {
-        // 1. Referencia al documento en Firebase
         const userDocRef = doc(this.firestore, `users/${this.currentUserUid}`);
-        
-        // 2. Actualizamos SOLO los campos que han cambiado
         await updateDoc(userDocRef, {
           name: formValues.name,
           username: formValues.username,
-          bio: formValues.bio
+          bio: formValues.bio,
         });
-
-        // 3. Actualizamos la vista localmente para que se vea rápido
         this.user.name = formValues.name;
         this.user.username = formValues.username;
         this.user.bio = formValues.bio;
-
-        // 4. Cerramos modal
         this.isEditing = false;
         alert('¡Perfil actualizado!');
-
       } catch (error) {
         console.error('Error al guardar:', error);
-        alert('Error al guardar cambios');
       }
     }
   }
@@ -145,7 +126,7 @@ export class ProfileComponent implements OnInit {
       await this.authService.logout();
       this.router.navigate(['/login']);
     } catch (error) {
-      console.error('Error al cerrar sesión', error);
+      console.error(error);
     }
   }
 }

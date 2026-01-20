@@ -57,17 +57,14 @@
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
-    box-sizing: border-box; /* Importante para que no se salga */
+    box-sizing: border-box;
 }
 
 .input-group input:focus {
     border-color: #007adf;
 }
 
-.input-error {
-    border-color: #ff4d4d !important;
-}
-
+/* Errores */
 .error-msg {
     color: #ff4d4d;
     font-size: 0.75rem;
@@ -110,7 +107,9 @@
     margin: 5px 0;
 }
 
+/* Botón secundario (Enlace) */
 .btn-secondary {
+    display: block;
     background-color: transparent;
     color: #007adf;
     border: 2px solid #007adf;
@@ -119,6 +118,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
+    text-decoration: none;
 }
 
 .btn-secondary:hover {

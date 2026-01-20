@@ -5,6 +5,7 @@ import { TripsComponent } from './pages/trips/trips';
 import { ItineraryComponent } from './pages/itinerary/itinerary';
 import { ExpensesComponent } from './pages/expenses/expenses';
 import { MemoriesComponent } from './pages/memories/memories';
+import { RegisterComponent } from './pages/register/register';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'trips', component: TripsComponent },
   { path: 'itinerary', component: ItineraryComponent },
+  { path: 'register', component: RegisterComponent }, // <--- NUEVA RUTA
   { path: 'expenses', component: ExpensesComponent },
   { path: 'memories', component: MemoriesComponent },
   { path: '**', redirectTo: 'login' }

@@ -15,11 +15,7 @@
           id="email" 
           formControlName="email" 
           placeholder="ejemplo@viajero.com"
-          [class.input-error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
         >
-        <span class="error-msg" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          Ingresa un correo válido.
-        </span>
       </div>
 
       <div class="input-group">
@@ -29,7 +25,6 @@
           id="password" 
           formControlName="password" 
           placeholder="******"
-          [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
         >
       </div>
 
@@ -37,7 +32,6 @@
         <button 
           type="button" 
           (click)="onLogin()" 
-          [disabled]="loginForm.invalid || isLoading" 
           class="btn-primary">
           {{ isLoading ? 'Cargando...' : 'Iniciar Aventura' }}
         </button>
@@ -46,13 +40,9 @@
           <span>o</span>
         </div>
 
-        <button 
-          type="button" 
-          (click)="onRegister()" 
-          [disabled]="loginForm.invalid || isLoading" 
-          class="btn-secondary">
+        <a routerLink="/register" class="btn-secondary">
           Crear cuenta nueva
-        </button>
+        </a>
       </div>
 
     </form>
