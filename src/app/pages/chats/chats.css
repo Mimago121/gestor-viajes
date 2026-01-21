@@ -1,13 +1,90 @@
-/* ... estilos anteriores ... */
-
 .chats-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  min-height: 80vh; /* Para centrar verticalmente el empty state si hace falta */
+  min-height: 80vh;
 }
 
-/* Estilos del Estado Vacío */
+.header-chat h1 {
+  margin-bottom: 2rem;
+  color: #111827;
+}
+
+/* Loading */
+.loading-state {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 3rem;
+}
+
+/* Spinner animado */
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #4f46e5;
+  border-radius: 50%;
+  margin: 0 auto 1rem auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Lista de Chats */
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.chat-item:hover {
+  background: #f9fafb;
+  transform: translateX(5px);
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.info p {
+  margin: 5px 0 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.status {
+  font-size: 0.5rem;
+}
+
+/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -15,7 +92,7 @@
   justify-content: center;
   text-align: center;
   margin-top: 3rem;
-  padding: 2rem;
+  padding: 3rem 2rem;
   background: #f9fafb;
   border-radius: 20px;
   border: 2px dashed #e5e7eb;
@@ -24,6 +101,7 @@
 .icon-placeholder {
   font-size: 4rem;
   margin-bottom: 1rem;
+  opacity: 0.5;
 }
 
 .empty-state h2 {

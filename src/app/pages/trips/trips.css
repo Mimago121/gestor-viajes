@@ -409,3 +409,148 @@
     border: 2px solid white;
     padding: 2px;
   }
+
+/* =========================================
+   ESTILOS NUEVOS PARA EL MODAL DE PLANTILLAS
+   ========================================= */
+
+/* Hacemos el modal un poco más ancho para que quepan las tarjetas */
+.modal.large-modal {
+    max-width: 700px;
+  }
+  
+  .helper-text {
+    color: #6b7280;
+    margin-top: -10px;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Grid de selección */
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 5px;
+  }
+  
+  /* Tarjeta de Plantilla en el Modal */
+  .template-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s;
+    background: white;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .template-card:hover {
+    transform: translateY(-3px);
+    border-color: #4f46e5;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+  }
+  
+  /* Estilo especial para "Desde Cero" */
+  .template-card.blank {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1rem;
+    background: #f9fafb;
+    border: 2px dashed #d1d5db;
+    min-height: 180px;
+  }
+  
+  .template-card.blank .icon-placeholder {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .template-card.blank h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #374151;
+  }
+  
+  /* Estilo para las plantillas con imagen */
+  .template-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+  
+  .t-content {
+    padding: 10px;
+  }
+  
+  .t-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 0.95rem;
+    color: #111827;
+  }
+  
+  .t-content p {
+    margin: 0 0 5px 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Cortar texto largo */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .t-content small {
+    font-size: 0.75rem;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+  
+  /* Botón de volver */
+  .btn-back {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0;
+    text-decoration: underline;
+  }
+  
+  .btn-back:hover {
+    color: #111827;
+  }
+
+  /* Asegura que el modal tenga fondo y tamaño */
+.modal {
+  background-color: white !important; /* Forzar blanco */
+  min-height: 200px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 20px;
+  padding: 2rem;
+  opacity: 1 !important; /* Forzar visibilidad */
+  display: block;
+  z-index: 1001; /* Encima del overlay */
+}
+
+/* El estilo de la cuadrícula de plantillas */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  margin-top: 1rem;
+}
+
+.template-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  background: white;
+}

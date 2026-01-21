@@ -1,0 +1,214 @@
+.admin-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- NUEVO: CABECERA FLEXIBLE --- */
+.admin-header {
+  display: flex;
+  justify-content: space-between; /* Título izquierda, Botones derecha */
+  align-items: center;
+  flex-wrap: wrap; /* Para móviles */
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.admin-header h1 { 
+  color: #111827; 
+  margin: 0 0 0.5rem 0; 
+}
+
+.admin-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.admin-social-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Estilo de los nuevos botones sociales */
+.btn-social {
+  text-decoration: none;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre icono y texto */
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-social:hover {
+  background-color: #f9fafb;
+  border-color: #4f46e5;
+  color: #4f46e5;
+  transform: translateY(-2px);
+}
+
+/* --- TABS --- */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #6b7280;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+}
+
+.tabs button.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+/* --- TABLAS --- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.data-table th, .data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.data-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge.admin {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* --- BOTONES DE TABLA --- */
+.btn-small {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.btn-small.danger {
+  color: #ef4444;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+/* --- FORMULARIO Y VIAJES --- */
+.btn-primary {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mb { margin-bottom: 1rem; }
+
+.create-box {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid #e5e7eb;
+}
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+.form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+
+.btn-save {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* --- GRID DE PLANTILLAS --- */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.template-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.template-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.t-info { padding: 1rem; }
+.t-info h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
+.t-info p { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
+.t-info small { color: #4f46e5; font-weight: 600; }
+
+.btn-del {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}

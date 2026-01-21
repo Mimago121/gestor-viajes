@@ -1,18 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
-import { Router, RouterModule } from '@angular/router'; // <--- AÑADIDO RouterModule
+import { Router, RouterModule } from '@angular/router'; 
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Trip } from '../../interfaces/Trip';
 import { MemberMini } from '../../interfaces/MemberMini';
-// Importamos 'where' y 'onSnapshot' para las notificaciones
-import { Firestore, collection, addDoc, query, orderBy, onSnapshot, where } from '@angular/fire/firestore';
+// AÑADIDO: getDocs para leer las plantillas
+import { Firestore, collection, addDoc, query, orderBy, onSnapshot, where, getDocs } from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
 import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-trips-page',
   standalone: true, 
-  imports: [CommonModule, ReactiveFormsModule, RouterModule], // <--- AÑADIDO RouterModule AQUÍ
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], 
   templateUrl: './trips.html',
   styleUrls: ['./trips.css'],
 })
@@ -23,9 +23,17 @@ export class TripsComponent implements OnInit {
   private router = inject(Router);
 
   trips: Trip[] = [];
+  // NUEVO: Array para guardar las plantillas del admin
+  templates: any[] = []; 
+  
   loading = true;
   errorMsg = '';
+  
+  // Control del Modal
   isCreateOpen = false;
+  // NUEVO: Controla si estamos viendo la lista de plantillas o el formulario
+  showTemplateSelection = true; 
+
   submitting = false;
   tripForm!: FormGroup;
   currentUser: MemberMini | null = null;
@@ -63,6 +71,9 @@ export class TripsComponent implements OnInit {
         
         // 2. ESCUCHAR NOTIFICACIONES (Solicitudes de amistad)
         this.listenForNotifications(user.uid);
+
+        // 3. NUEVO: Cargar plantillas del admin
+        this.loadTemplates();
         
       } else {
         this.currentUser = null;
@@ -70,15 +81,21 @@ export class TripsComponent implements OnInit {
     });
   }
 
+  // --- NUEVO: CARGAR PLANTILLAS DEL ADMIN ---
+  async loadTemplates() {
+    try {
+      const q = query(collection(this.firestore, 'trip_templates'));
+      const snapshot = await getDocs(q);
+      this.templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error("Error cargando plantillas:", error);
+    }
+  }
+
   // --- LÓGICA DE NOTIFICACIONES ---
   listenForNotifications(uid: string) {
     const requestsRef = collection(this.firestore, 'friend_requests');
-    // Buscamos solicitudes pendientes dirigidas a mí
-    const q = query(
-      requestsRef, 
-      where('toUid', '==', uid), 
-      where('status', '==', 'pending')
-    );
+    const q = query(requestsRef, where('toUid', '==', uid), where('status', '==', 'pending'));
 
     onSnapshot(q, (snapshot) => {
       this.notificationCount = snapshot.size;
@@ -94,7 +111,27 @@ export class TripsComponent implements OnInit {
   openCreate(): void {
     this.errorMsg = '';
     this.isCreateOpen = true;
+    this.showTemplateSelection = true; // Empezamos mostrando la selección
     this.tripForm.reset();
+  }
+
+  // --- NUEVO: SELECCIONAR PLANTILLA ---
+  selectTemplate(template: any | null) {
+    this.showTemplateSelection = false; // Ocultamos selección, mostramos formulario
+
+    if (template) {
+      // Si eligió plantilla, rellenamos el formulario con sus datos
+      this.tripForm.patchValue({
+        destination: template.destination,
+        // Usamos la descripción de la plantilla como nombre sugerido
+        name: template.description || `Viaje a ${template.destination}`,
+        imageUrl: template.imageUrl,
+        // Dejamos origen y fechas vacíos para que el usuario elija
+      });
+    } else {
+      // Si es null, es "Viaje en blanco", reseteamos
+      this.tripForm.reset();
+    }
   }
 
   closeCreate(): void {

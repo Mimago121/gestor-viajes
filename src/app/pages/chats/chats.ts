@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // <--- IMPORTANTE: Para usar routerLink
+import { RouterModule } from '@angular/router'; 
 import { AuthService } from '../../services/auth.service';
 import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-chats',
   standalone: true,
-  imports: [CommonModule, RouterModule], // <--- AÑADIR AQUÍ
+  imports: [CommonModule, RouterModule], 
   templateUrl: './chats.html',
   styleUrls: ['./chats.css']
 })
@@ -33,19 +33,30 @@ export class ChatsComponent implements OnInit {
   }
 
   loadChats(uid: string) {
+    this.loading = true;
     const userDocRef = doc(this.firestore, `users/${uid}`);
     
+    // Escuchamos cambios en tiempo real
     onSnapshot(userDocRef, async (docSnap) => {
-      if (docSnap.exists()) {
-        const friendIds = docSnap.data()['friends'] || [];
-        this.chats = []; 
+      // 1. Si el usuario no existe en BD (raro, pero posible)
+      if (!docSnap.exists()) {
+        this.loading = false;
+        return;
+      }
 
-        if (friendIds.length === 0) {
-          this.loading = false;
-          return;
-        }
+      const data = docSnap.data();
+      // 2. Leemos amigos. Si es undefined, usamos array vacío []
+      const friendIds = data['friends'] || []; 
 
-        // Cargamos info de cada amigo
+      // 3. Si no tiene amigos, paramos carga y limpiamos chats
+      if (!Array.isArray(friendIds) || friendIds.length === 0) {
+        this.chats = [];
+        this.loading = false;
+        return;
+      }
+
+      // 4. Si TIENE amigos, cargamos sus datos
+      try {
         const loadedChats = [];
         for (const friendId of friendIds) {
           const fDoc = await getDoc(doc(this.firestore, `users/${friendId}`));
@@ -53,7 +64,7 @@ export class ChatsComponent implements OnInit {
             const fData = fDoc.data();
             loadedChats.push({
               id: friendId,
-              name: fData['name'],
+              name: fData['name'] || 'Usuario',
               avatar: fData['avatar'] || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
               lastMessage: 'Haz clic para chatear...', 
               unread: false 
@@ -61,13 +72,16 @@ export class ChatsComponent implements OnInit {
           }
         }
         this.chats = loadedChats;
+      } catch (error) {
+        console.error("Error cargando chats:", error);
+      } finally {
+        // 5. Pase lo que pase, dejamos de cargar
         this.loading = false;
       }
     });
   }
 
   openChat(friendId: string) {
-    alert(`Abriendo chat con ${friendId}`);
-    // Aquí redirigirías a la sala de chat real
+    alert(`Próximamente: Chat real con ${friendId}`);
   }
 }

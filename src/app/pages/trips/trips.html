@@ -62,16 +62,41 @@
 </div>
 
 <div class="modal-overlay" *ngIf="isCreateOpen" (click)="onOverlayClick($event)">
-  <div class="modal">
+  <div class="modal large-modal">
+    
     <div class="modal-header">
-      <h2>Crear viaje</h2>
+      <h2>{{ showTemplateSelection ? 'Elige tu aventura' : 'Detalles del viaje' }}</h2>
       <button class="icon-btn" (click)="closeCreate()" [disabled]="submitting">✕</button>
     </div>
 
-    <form [formGroup]="tripForm" (ngSubmit)="createTrip()" class="form">
+    <div *ngIf="showTemplateSelection" class="template-selection">
+      <p class="helper-text">Elige un destino sugerido o crea uno desde cero.</p>
+      
+      <div class="templates-grid">
+        <div class="template-card blank" (click)="selectTemplate(null)">
+          <div class="icon-placeholder">✨</div>
+          <h3>Desde cero</h3>
+          <p>Personaliza todo</p>
+        </div>
+
+        <div class="template-card" *ngFor="let t of templates" (click)="selectTemplate(t)">
+          <img [src]="t.imageUrl || 'https://via.placeholder.com/150'" alt="Destino">
+          <div class="t-content">
+            <h3>{{ t.destination }}</h3>
+            <p>{{ t.description }}</p>
+            <small>⏱ {{ t.durationDays }} días sugeridos</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form *ngIf="!showTemplateSelection" [formGroup]="tripForm" (ngSubmit)="createTrip()" class="form">
+      
+      <button type="button" class="btn-back" (click)="showTemplateSelection = true">← Volver a elegir</button>
+
       <div class="row">
-        <label>Nombre</label>
-        <input type="text" formControlName="name" placeholder="Ej: Roma 2026" />
+        <label>Nombre del viaje</label>
+        <input type="text" formControlName="name" placeholder="Ej: Verano 2026" />
         <div class="field-error" *ngIf="tripForm.get('name')?.touched && tripForm.get('name')?.invalid">
           <span *ngIf="tripForm.get('name')?.errors?.['required']">El nombre es obligatorio.</span>
           <span *ngIf="tripForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</span>

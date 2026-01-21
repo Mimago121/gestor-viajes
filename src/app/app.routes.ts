@@ -8,6 +8,8 @@ import { MemoriesComponent } from './pages/memories/memories';
 import { RegisterComponent } from './pages/register/register';
 import { FriendsComponent } from './pages/friends/friends';
 import { ChatsComponent } from './pages/chats/chats';
+import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,5 +22,10 @@ export const routes: Routes = [
   { path: 'memories', component: MemoriesComponent },
   { path: 'chats', component: ChatsComponent },
   { path: 'friends', component: FriendsComponent },
-  { path: '**', redirectTo: 'login' }
+  {
+    path: 'admin',
+    component: AdminDashboardComponent,
+    canActivate: [adminGuard],
+  },
+  { path: '**', redirectTo: 'login' },
 ];

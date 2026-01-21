@@ -4,6 +4,7 @@
   </div>
   
   <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
     <p>Cargando conversaciones...</p>
   </div>
 
@@ -20,7 +21,7 @@
 
   <div class="empty-state" *ngIf="!loading && chats.length === 0">
     <div class="icon-placeholder">👥</div>
-    <h2>No tienes amigos</h2>
+    <h2>No tienes amigos aún</h2>
     <p>Debes conocer personas para poder chatear.</p>
     
     <a routerLink="/friends" class="btn-find-friends">
