@@ -9,6 +9,7 @@ import { RegisterComponent } from './pages/register/register';
 import { FriendsComponent } from './pages/friends/friends';
 import { ChatsComponent } from './pages/chats/chats';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard';
+import { ChatRoomComponent } from './pages/chat-room/chat-room';
 import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'expenses', component: ExpensesComponent },
   { path: 'memories', component: MemoriesComponent },
   { path: 'chats', component: ChatsComponent },
+  { path: 'chat/:uid', component: ChatRoomComponent },
   { path: 'friends', component: FriendsComponent },
   {
     path: 'admin',

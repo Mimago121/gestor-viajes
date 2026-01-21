@@ -43,13 +43,23 @@
   <hr class="divider">
 
   <div class="requests-section" *ngIf="receivedRequests.length > 0">
-    <h2>Solicitudes de Amistad 📩</h2>
+    <h2>Solicitudes de Amistad ({{ receivedRequests.length }}) 📩</h2>
     <div class="request-list">
       <div class="request-item" *ngFor="let req of receivedRequests">
+        
         <div class="req-info">
-          <img [src]="req.fromAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" alt="Avatar">
-          <span><strong>{{ req.fromUsername }}</strong> quiere ser tu amigo.</span>
+          <img 
+            [src]="req.fromAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
+            class="req-avatar"
+            alt="Avatar"
+          >
+          <div class="req-text">
+            <span class="req-name">{{ req.fromName || 'Usuario' }}</span>
+            <span class="req-handle">{{ req.fromUsername }}</span>
+            <span class="req-msg">quiere conectar contigo</span>
+          </div>
         </div>
+
         <div class="req-actions">
           <button class="btn-accept" (click)="acceptRequest(req)">Aceptar</button>
           <button class="btn-reject" (click)="rejectRequest(req.id)">Rechazar</button>

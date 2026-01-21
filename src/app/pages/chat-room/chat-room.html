@@ -1,0 +1,36 @@
+<div class="chat-room">
+  
+  <header class="chat-header">
+    <button (click)="goBack()" class="btn-back">←</button>
+    <img [src]="friendAvatar" class="avatar">
+    <h3>{{ friendName }}</h3>
+  </header>
+
+  <div class="messages-container" #scrollContainer>
+    <div *ngIf="loading" class="loading">Cargando charla...</div>
+
+    <div *ngIf="!loading && messages.length === 0" class="empty-chat">
+      <p>Di "Hola" 👋</p>
+    </div>
+
+    <div 
+      class="message-bubble" 
+      *ngFor="let msg of messages"
+      [class.mine]="msg.senderId === currentUserId"
+      [class.theirs]="msg.senderId !== currentUserId"
+    >
+      {{ msg.text }}
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input 
+      type="text" 
+      [(ngModel)]="newMessage" 
+      (keyup.enter)="sendMessage()" 
+      placeholder="Escribe un mensaje..."
+    >
+    <button (click)="sendMessage()" [disabled]="!newMessage.trim()">➤</button>
+  </div>
+
+</div>

@@ -231,21 +231,50 @@ header p {
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 10px 15px;
-  border-radius: 10px;
+  padding: 15px; /* Más padding para que respire */
+  border-radius: 12px;
   margin-bottom: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .req-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
-.req-info img {
-  width: 40px;
-  height: 40px;
+/* Avatar de la solicitud */
+.req-avatar {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+/* Columna de texto (Nombre, Handle, Mensaje) */
+.req-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.req-name {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.req-handle {
+  font-size: 0.85rem;
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.req-msg {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 2px;
 }
 
 .req-actions {
@@ -260,6 +289,7 @@ header p {
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-reject {
@@ -269,6 +299,7 @@ header p {
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 /* Empty State */

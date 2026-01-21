@@ -1,0 +1,115 @@
+.chat-room {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+/* Header fijo arriba */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chat-header h3 { margin: 0; font-size: 1.1rem; }
+
+/* Contenedor de mensajes con scroll */
+.messages-container {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loading, .empty-chat {
+  text-align: center;
+  color: #9ca3af;
+  margin-top: 2rem;
+}
+
+/* Burbujas */
+.message-bubble {
+  max-width: 75%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* Mis mensajes (Derecha) */
+.message-bubble.mine {
+  align-self: flex-end;
+  background-color: #4f46e5;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+/* Sus mensajes (Izquierda) */
+.message-bubble.theirs {
+  align-self: flex-start;
+  background-color: #e5e7eb;
+  color: #1f2937;
+  border-bottom-left-radius: 4px;
+}
+
+/* Input fijo abajo */
+.input-area {
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 10px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  outline: none;
+}
+
+.input-area input:focus { border-color: #4f46e5; }
+
+.input-area button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.input-area button:disabled {
+  background: #e5e7eb;
+  cursor: default;
+}
