@@ -5,23 +5,24 @@
       <p class="subtitle">Crea un viaje y organiza el plan con tu grupo.</p>
     </div>
 
-    <button class="btn primary" (click)="openCreate()">+ Crear viaje</button>
+    <div class="header-actions">
+      <a routerLink="/friends" class="btn-icon-add" title="Buscar amigos">
+        👤+
+      </a>
+      <button class="btn primary" (click)="openCreate()">+ Crear viaje</button>
+    </div>
   </div>
 
-  <!-- Loading -->
   <div *ngIf="loading" class="info">Cargando viajes...</div>
 
-  <!-- Error -->
   <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
-  <!-- Empty state -->
   <div *ngIf="!loading && trips.length === 0" class="empty">
     <h3>No tienes viajes todavía</h3>
     <p>Crea tu primer viaje para empezar a organizarlo.</p>
     <button class="btn primary" (click)="openCreate()">Crear viaje</button>
   </div>
 
-  <!-- Trips grid -->
   <div class="grid" *ngIf="!loading && trips.length > 0">
     <div class="trip-card" *ngFor="let trip of trips">
       <img class="trip-img" [src]="getTripImage(trip)" alt="Imagen del destino" />
@@ -42,7 +43,7 @@
             <img
               class="avatar"
               *ngFor="let m of visibleMembers(trip)"
-              [src]="m.avatarUrl || 'https://i.pravatar.cc/100?u=' + m.id"
+              [src]="m.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
               [alt]="m.name"
               [title]="m.name"
             />
@@ -53,7 +54,6 @@
         </div>
 
         <div class="actions">
-          <!-- en el futuro: navegar a detalle /trip/:id -->
           <button class="btn ghost" type="button">Ver detalle</button>
         </div>
       </div>
@@ -61,12 +61,7 @@
   </div>
 </div>
 
-<!-- Modal crear viaje -->
-<div
-  class="modal-overlay"
-  *ngIf="isCreateOpen"
-  (click)="onOverlayClick($event)"
->
+<div class="modal-overlay" *ngIf="isCreateOpen" (click)="onOverlayClick($event)">
   <div class="modal">
     <div class="modal-header">
       <h2>Crear viaje</h2>
@@ -135,3 +130,13 @@
     </form>
   </div>
 </div>
+
+<button class="fab-chat" (click)="goToChats()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+  
+  <span class="notification-badge" *ngIf="hasNotifications">
+    {{ notificationCount }}
+  </span>
+</button>

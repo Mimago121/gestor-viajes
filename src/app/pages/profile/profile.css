@@ -1,305 +1,335 @@
 /* =========================================
    DISEÑO GENERAL DEL PERFIL
    ========================================= */
-:host {
-  display: block;
-  background-color: #f8fafc; /* Fondo gris muy suave para toda la página */
-  min-height: 100vh;
-  padding: 2rem 1rem;
-}
-
-.profile-container {
-  max-width: 500px; /* Un poco más ancho */
-  margin: 0 auto;
-  background: white;
-  padding: 2.5rem;
-  border-radius: 24px; /* Bordes más redondeados */
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05); /* Sombra suave y moderna */
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-/* --- Cabecera --- */
-.profile-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 1rem;
-  /* Sombra brillante en lugar de borde sólido */
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
-  border: 4px solid white; /* Anillo blanco para separar del fondo */
-}
-
-.profile-header h2 {
-  margin: 0.5rem 0;
-  font-size: 1.8rem;
-  color: #111827;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.username {
-  display: inline-block;
-  color: #4f46e5; /* Color de marca */
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: #eef2ff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  margin-bottom: 1rem;
-}
-
-.bio {
-  margin-top: 0.8rem;
-  font-size: 1rem;
-  color: #4b5563;
-  line-height: 1.5;
-  max-width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* --- Estadísticas (Cards limpias) --- */
-.stats {
-  display: flex;
-  justify-content: space-around;
-  margin: 2.5rem 0;
-  gap: 1rem;
-}
-
-.stat {
-  flex: 1;
-  background-color: white;
-  /* Borde sutil en lugar de fondo sólido */
-  border: 1px solid #e5e7eb;
-  color: #111827;
-  padding: 1.2rem 0.5rem;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
-  border-color: #c7d2fe;
-}
-
-.stat strong {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #4f46e5;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.stat span {
-  font-size: 0.85rem;
-  color: #6b7280;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* --- Próximo Viaje --- */
-.next-trip {
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  padding: 1.5rem;
-  border-radius: 18px;
-  margin-bottom: 2rem;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Decoración sutil */
-.next-trip::before {
-  content: '✈️';
-  position: absolute;
-  top: -10px;
-  right: 10px;
-  font-size: 4rem;
-  opacity: 0.05;
-  transform: rotate(15deg);
-}
-
-.next-trip h3 {
-  margin: 0 0 0.8rem 0;
-  font-size: 1.1rem;
-  color: #374151;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.next-trip p {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-
-.next-trip span {
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #4f46e5;
-  font-weight: 600;
-  background: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* --- Botones --- */
-.actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.btn {
-  flex: 1;
-  padding: 1rem;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1rem;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.primary {
-  background: #4f46e5;
-  color: white;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-}
-
-.primary:hover {
-  background: #4338ca;
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
-}
-
-.secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 2px solid #e5e7eb;
-}
-
-.secondary:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-
-/* =========================================
-   NUEVO DISEÑO DEL MODAL (Ventana de Editar)
-   ========================================= */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  /* Fondo más oscuro y con desenfoque potente */
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 1rem;
-}
-
-.modal-card {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 24px;
-  width: 100%;
-  max-width: 450px;
-  /* Sombra profunda para que flote de verdad */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  animation: modalPopUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalPopUp {
-  from { opacity: 0; transform: scale(0.95) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-card h3 {
-  margin-top: 0;
-  margin-bottom: 2rem;
-  color: #111827;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-/* --- Inputs Modernos --- */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.6rem;
-  margin-left: 4px;
-}
-
-.form-group input, 
-.form-group textarea {
-  width: 100%;
-  padding: 1rem; /* Inputs más altos y cómodos */
-  border: 2px solid #e5e7eb;
-  background-color: #f9fafb;
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 1rem;
-  color: #111827;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* Efecto al hacer click en el input */
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #4f46e5; /* Color de marca */
-  background-color: white;
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); /* Anillo de enfoque suave */
-}
-
-.modal-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-}
+   :host {
+    display: block;
+    background-color: #f8fafc; /* Fondo gris muy suave */
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  
+  .profile-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* --- Cabecera --- */
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .avatar-section {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  
+  .avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    border: 4px solid white;
+  }
+  
+  /* Botón flotante de editar (lápiz) */
+  .edit-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 0;
+    background: #4f46e5;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  
+  .edit-btn:hover {
+    transform: scale(1.05);
+    background: #4338ca;
+  }
+  
+  .user-info h1 {
+    margin: 0.5rem 0;
+    font-size: 1.8rem;
+    color: #111827;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  
+  .username {
+    display: inline-block;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: #eef2ff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin: 0;
+  }
+  
+  .bio {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #4b5563;
+    line-height: 1.5;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .divider {
+    border: 0;
+    height: 1px;
+    background: #e5e7eb;
+    margin: 2rem 0;
+  }
+  
+  /* --- Estadísticas --- */
+  .stats-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .stat-item {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    padding: 1rem 0.5rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+    border-color: #c7d2fe;
+  }
+  
+  .stat-item strong {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #4f46e5;
+    margin-bottom: 4px;
+  }
+  
+  .stat-item span {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* --- Próximo Viaje --- */
+  .next-trip-section h2 {
+    font-size: 1.1rem;
+    color: #374151;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .trip-card {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    padding: 1.5rem;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .trip-icon {
+    font-size: 2.5rem;
+    background: white;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  
+  .trip-details h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #111827;
+  }
+  
+  .trip-details p {
+    margin: 5px 0 0 0;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  /* --- Botón Cerrar Sesión --- */
+  .logout-btn {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .logout-btn:hover {
+    background-color: #fee2e2;
+    border-color: #fecaca;
+  }
+  
+  /* =========================================
+     MODAL DE EDICIÓN (Overlay)
+     ========================================= */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(17, 24, 39, 0.7); /* Oscuro */
+    backdrop-filter: blur(5px); /* Desenfoque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 1rem;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalPopUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  @keyframes modalPopUp {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  
+  .modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #111827;
+    font-size: 1.5rem;
+  }
+  
+  /* Inputs del Formulario */
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-group input, 
+  .form-group textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  }
+  
+  .form-group small {
+    display: block;
+    text-align: right;
+    color: #9ca3af;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+  
+  /* Botones del Modal */
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .modal-actions button {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    border: none;
+    transition: transform 0.1s;
+  }
+  
+  .modal-actions button:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-cancel {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 2px solid transparent;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .btn-save {
+    background-color: #4f46e5;
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  }
+  
+  .btn-save:hover:not(:disabled) {
+    background-color: #4338ca;
+  }
+  
+  .btn-save:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+  }

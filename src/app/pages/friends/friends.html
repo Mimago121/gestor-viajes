@@ -1,0 +1,85 @@
+<div class="friends-container">
+  
+  <header>
+    <h1>Comunidad 🤝</h1>
+    <p>Encuentra compañeros de viaje</p>
+  </header>
+
+  <div class="search-section">
+    <div class="search-wrapper">
+      
+      <div class="search-box">
+        <input 
+          type="text" 
+          [formControl]="searchControl" 
+          placeholder="Escribe un nombre para buscar..."
+          autocomplete="off"
+        >
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="dropdown-results" *ngIf="showDropdown && filteredUsers.length > 0">
+        <div class="dropdown-item" *ngFor="let user of filteredUsers">
+          <div class="user-data">
+            <img [src]="user.avatar" alt="Avatar">
+            <div>
+              <strong>{{ user.name }}</strong>
+              <small>{{ user.username }}</small>
+            </div>
+          </div>
+          <button class="btn-mini-add" (click)="sendRequest(user)">
+            Enviar Solicitud
+          </button>
+        </div>
+      </div>
+
+      <div class="dropdown-results empty" *ngIf="showDropdown && filteredUsers.length === 0">
+        <p>No se encontraron usuarios.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="requests-section" *ngIf="receivedRequests.length > 0">
+    <h2>Solicitudes de Amistad 📩</h2>
+    <div class="request-list">
+      <div class="request-item" *ngFor="let req of receivedRequests">
+        <div class="req-info">
+          <img [src]="req.fromAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" alt="Avatar">
+          <span><strong>{{ req.fromUsername }}</strong> quiere ser tu amigo.</span>
+        </div>
+        <div class="req-actions">
+          <button class="btn-accept" (click)="acceptRequest(req)">Aceptar</button>
+          <button class="btn-reject" (click)="rejectRequest(req.id)">Rechazar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="my-friends-section">
+    <h2>Mis Amigos ({{ myFriends.length }}) 🌍</h2>
+    
+    <div class="friends-grid" *ngIf="myFriends.length > 0; else noFriends">
+      <div class="friend-card" *ngFor="let friend of myFriends">
+        <img [src]="friend.avatar" alt="Friend">
+        <div class="friend-info">
+          <h4>{{ friend.name }}</h4>
+          <small>{{ friend.username }}</small>
+        </div>
+        <button class="btn-chat" (click)="openChat(friend.uid!)">
+          💬 Chat
+        </button>
+      </div>
+    </div>
+
+    <ng-template #noFriends>
+      <div class="empty-state">
+        <p>Aún no tienes amigos agregados.</p>
+        <p>¡Usa el buscador para conectar!</p>
+      </div>
+    </ng-template>
+  </div>
+
+</div>

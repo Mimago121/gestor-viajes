@@ -2,8 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+// Imports de Firebase
 import { AuthService } from '../../services/auth.service';
-import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore'; // Añadido setDoc
+import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
 
 @Component({
@@ -20,7 +22,9 @@ export class ProfileComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
+  // Estado del modal y carga
   isEditing = false;
+  isSaving = false; // Para mostrar "Guardando..." en el botón
   editForm: FormGroup;
   currentUserUid: string | null = null;
 
@@ -36,10 +40,11 @@ export class ProfileComponent implements OnInit {
   };
 
   constructor() {
+    // Inicializamos el formulario con validaciones
     this.editForm = this.fb.group({
-      name: ['', Validators.required],
-      username: ['', Validators.required],
-      bio: ['']
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      bio: ['', [Validators.maxLength(150)]] // Máximo 150 letras para la bio
     });
   }
 
@@ -56,60 +61,47 @@ export class ProfileComponent implements OnInit {
 
   async loadUserProfile(authUser: User) {
     const userDocRef = doc(this.firestore, `users/${authUser.uid}`);
-    const userSnapshot = await getDoc(userDocRef);
-
-    if (userSnapshot.exists()) {
-      // 1. SI EXISTE: CARGAMOS DATOS
-      const data = userSnapshot.data();
-      this.user = {
-        name: data['name'] || 'Viajero',
-        username: data['username'] || '@usuario',
-        bio: data['bio'] || 'Sin biografía',
-        avatar: data['avatar'] || this.defaultAvatar,
-        stats: data['stats'] || { trips: 0, countries: 0, friends: 0 },
-        nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
-      };
-      // Actualizamos formulario
-      this.editForm.patchValue({
-        name: this.user.name,
-        username: this.user.username,
-        bio: this.user.bio
-      });
-
-    } else {
-      // 2. SI NO EXISTE: LO CREAMOS AHORA MISMO (Auto-reparación)
-      console.log("El perfil no existía en base de datos. Creándolo...");
+    try {
+      const userSnapshot = await getDoc(userDocRef);
       
-      const newProfile = {
-        name: authUser.email?.split('@')[0] || 'Viajero',
-        username: '@' + (authUser.email?.split('@')[0] || 'usuario'),
-        bio: '¡Hola! Soy nuevo en TripShare.',
-        avatar: this.defaultAvatar,
-        stats: { trips: 0, countries: 0, friends: 0 },
-        nextTrip: { destination: 'Planificar viaje', date: 'Pronto' }
-      };
-
-      // Lo guardamos en Firebase para la próxima
-      await setDoc(userDocRef, newProfile);
-      
-      // Lo mostramos en pantalla
-      this.user = newProfile;
-      this.editForm.patchValue({
-        name: this.user.name,
-        username: this.user.username,
-        bio: this.user.bio
-      });
+      if (userSnapshot.exists()) {
+        const data = userSnapshot.data();
+        this.user = {
+          name: data['name'] || 'Viajero',
+          username: data['username'] || '@usuario',
+          bio: data['bio'] || 'Sin biografía',
+          avatar: data['avatar'] || this.defaultAvatar,
+          stats: data['stats'] || { trips: 0, countries: 0, friends: 0 },
+          nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
+        };
+      } else {
+        // Auto-reparación si no existe documento
+        const newProfile = {
+          name: authUser.email?.split('@')[0] || 'Viajero',
+          username: '@' + (authUser.email?.split('@')[0] || 'usuario'),
+          bio: '¡Hola! Soy nuevo en TripShare.',
+          avatar: this.defaultAvatar,
+          stats: { trips: 0, countries: 0, friends: 0 },
+          nextTrip: { destination: 'Planificar', date: '' }
+        };
+        await setDoc(userDocRef, newProfile);
+        this.user = newProfile;
+      }
+    } catch (error) {
+      console.error('Error cargando perfil:', error);
     }
   }
 
-  // ... (El resto de funciones openEditModal, saveProfile, logout IGUAL QUE ANTES)
-  
+  // --- FUNCIONES DEL MODAL ---
+
   openEditModal() {
+    // 1. Rellenamos el formulario con los datos actuales del usuario
     this.editForm.patchValue({
       name: this.user.name,
       username: this.user.username,
       bio: this.user.bio
     });
+    // 2. Mostramos el modal
     this.isEditing = true;
   }
 
@@ -118,29 +110,41 @@ export class ProfileComponent implements OnInit {
   }
 
   async saveProfile() {
-    if (this.editForm.valid && this.currentUserUid) {
-      const formValues = this.editForm.value;
-      try {
-        const userDocRef = doc(this.firestore, `users/${this.currentUserUid}`);
-        await updateDoc(userDocRef, {
-          name: formValues.name,
-          username: formValues.username,
-          bio: formValues.bio
-        });
-        this.user.name = formValues.name;
-        this.user.username = formValues.username;
-        this.user.bio = formValues.bio;
-        this.isEditing = false;
-      } catch (error) {
-        console.error('Error al guardar:', error);
-      }
+    if (this.editForm.invalid) return;
+    if (!this.currentUserUid) return;
+
+    this.isSaving = true;
+    const formValues = this.editForm.value;
+
+    try {
+      // 1. Referencia al documento en Firebase
+      const userDocRef = doc(this.firestore, `users/${this.currentUserUid}`);
+
+      // 2. Actualizamos SOLO los campos editados
+      await updateDoc(userDocRef, {
+        name: formValues.name,
+        username: formValues.username,
+        bio: formValues.bio
+      });
+
+      // 3. Actualizamos la vista local (para que se vea rápido sin recargar)
+      this.user.name = formValues.name;
+      this.user.username = formValues.username;
+      this.user.bio = formValues.bio;
+
+      // 4. Cerramos
+      this.isEditing = false;
+      
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      alert('Hubo un problema al guardar.');
+    } finally {
+      this.isSaving = false;
     }
   }
 
   async logout() {
-    try {
-      await this.authService.logout();
-      this.router.navigate(['/login']);
-    } catch (error) { console.error(error); }
+    await this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

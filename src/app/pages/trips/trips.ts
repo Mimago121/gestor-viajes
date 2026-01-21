@@ -1,16 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
+import { Router, RouterModule } from '@angular/router'; // <--- AÑADIDO RouterModule
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Trip } from '../../interfaces/Trip';
 import { MemberMini } from '../../interfaces/MemberMini';
-import { Firestore, collection, addDoc, query, orderBy, onSnapshot } from '@angular/fire/firestore';
+// Importamos 'where' y 'onSnapshot' para las notificaciones
+import { Firestore, collection, addDoc, query, orderBy, onSnapshot, where } from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
 import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-trips-page',
   standalone: true, 
-  imports: [CommonModule, ReactiveFormsModule], 
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // <--- AÑADIDO RouterModule AQUÍ
   templateUrl: './trips.html',
   styleUrls: ['./trips.css'],
 })
@@ -18,6 +20,7 @@ export class TripsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   trips: Trip[] = [];
   loading = true;
@@ -27,10 +30,11 @@ export class TripsComponent implements OnInit {
   tripForm!: FormGroup;
   currentUser: MemberMini | null = null;
 
-  // URL FIJA PARA EL USUARIO POR DEFECTO
+  // --- VARIABLES PARA NOTIFICACIONES ---
+  hasNotifications = false;
+  notificationCount = 0;
+
   readonly defaultUserAvatar = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-  
-  // URL FIJA PARA IMAGEN DE VIAJE (Placeholder)
   readonly fallbackTripImg = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1000&q=80';
 
   ngOnInit(): void {
@@ -51,14 +55,39 @@ export class TripsComponent implements OnInit {
         this.currentUser = {
           id: user.uid,
           name: user.displayName || user.email?.split('@')[0] || 'Viajero',
-          // <--- AQUÍ USAMOS LA URL:
           avatarUrl: user.photoURL || this.defaultUserAvatar, 
         };
+        
+        // 1. Cargar viajes
         this.loadTripsRealtime();
+        
+        // 2. ESCUCHAR NOTIFICACIONES (Solicitudes de amistad)
+        this.listenForNotifications(user.uid);
+        
       } else {
         this.currentUser = null;
       }
     });
+  }
+
+  // --- LÓGICA DE NOTIFICACIONES ---
+  listenForNotifications(uid: string) {
+    const requestsRef = collection(this.firestore, 'friend_requests');
+    // Buscamos solicitudes pendientes dirigidas a mí
+    const q = query(
+      requestsRef, 
+      where('toUid', '==', uid), 
+      where('status', '==', 'pending')
+    );
+
+    onSnapshot(q, (snapshot) => {
+      this.notificationCount = snapshot.size;
+      this.hasNotifications = this.notificationCount > 0;
+    });
+  }
+
+  goToChats() {
+    this.router.navigate(['/chats']); 
   }
 
   // ---------- UI actions ----------
@@ -141,7 +170,6 @@ export class TripsComponent implements OnInit {
     return trip.imageUrl || this.fallbackTripImg;
   }
 
-  // ... (El resto de helpers y validadores se quedan igual)
   formatDateRange(startIso: string, endIso: string): string {
     const s = this.formatIsoDate(startIso);
     const e = this.formatIsoDate(endIso);

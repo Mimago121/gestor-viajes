@@ -1,0 +1,54 @@
+/* ... estilos anteriores ... */
+
+.chats-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 80vh; /* Para centrar verticalmente el empty state si hace falta */
+}
+
+/* Estilos del Estado Vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 20px;
+  border: 2px dashed #e5e7eb;
+}
+
+.icon-placeholder {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  max-width: 300px;
+}
+
+.btn-find-friends {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s, background-color 0.2s;
+  display: inline-block;
+}
+
+.btn-find-friends:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}

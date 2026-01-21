@@ -1,64 +1,79 @@
 <div class="profile-container">
-
-  <div class="profile-header">
-    <img class="avatar" [src]="user.avatar" alt="Avatar del usuario">
-    <h2>{{ user.name }}</h2>
-    <span class="username">{{ user.username }}</span>
-    <p class="bio">{{ user.bio }}</p>
-  </div>
-
-  <div class="stats">
-    <div class="stat">
-      <strong>{{ user.stats.trips }}</strong>
-      <span>Viajes</span>
+  
+  <header class="profile-header">
+    <div class="avatar-section">
+      <img [src]="user.avatar" alt="Avatar" class="avatar-img">
+      <button class="edit-btn" (click)="openEditModal()">
+        ✏️ Editar
+      </button>
     </div>
-    <div class="stat">
-      <strong>{{ user.stats.countries }}</strong>
-      <span>Países</span>
+    
+    <div class="user-info">
+      <h1>{{ user.name }}</h1>
+      <p class="username">{{ user.username }}</p>
+      <p class="bio">{{ user.bio }}</p>
     </div>
-    <div class="stat">
-      <strong>{{ user.stats.friends }}</strong>
-      <span>Amigos</span>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <strong>{{ user.stats.trips }}</strong>
+        <span>Viajes</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ user.stats.countries }}</strong>
+        <span>Países</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ user.stats.friends }}</strong>
+        <span>Amigos</span>
+      </div>
     </div>
-  </div>
+  </header>
 
-  <div class="next-trip">
-    <h3>✈️ Próximo viaje</h3>
-    <p>{{ user.nextTrip.destination }}</p>
-    <span style="font-size: 0.85rem; color: #666;">{{ user.nextTrip.date }}</span>
-  </div>
+  <hr class="divider">
 
-  <div class="actions">
-    <button class="btn primary" (click)="openEditModal()">Editar perfil</button>
-    <button class="btn secondary" (click)="logout()">Cerrar sesión</button>
-  </div>
+  <section class="next-trip-section">
+    <h2>Próxima Aventura</h2>
+    <div class="trip-card">
+      <div class="trip-icon">✈️</div>
+      <div class="trip-details">
+        <h3>{{ user.nextTrip.destination }}</h3>
+        <p>{{ user.nextTrip.date }}</p>
+      </div>
+    </div>
+  </section>
+
+  <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
 
 </div>
 
 <div class="modal-overlay" *ngIf="isEditing">
-  <div class="modal-card">
+  <div class="modal-content">
     <h3>Editar Perfil</h3>
     
     <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
       
       <div class="form-group">
         <label>Nombre</label>
-        <input type="text" formControlName="name">
+        <input type="text" formControlName="name" placeholder="Tu nombre">
       </div>
 
       <div class="form-group">
         <label>Usuario (@)</label>
-        <input type="text" formControlName="username">
+        <input type="text" formControlName="username" placeholder="@usuario">
       </div>
 
       <div class="form-group">
         <label>Biografía</label>
-        <textarea formControlName="bio" rows="3"></textarea>
+        <textarea formControlName="bio" rows="3" placeholder="Cuéntanos algo sobre ti..."></textarea>
+        <small>{{ editForm.get('bio')?.value?.length || 0 }}/150</small>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn secondary" (click)="closeEditModal()">Cancelar</button>
-        <button type="submit" class="btn primary" [disabled]="editForm.invalid">Guardar</button>
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">Cancelar</button>
+        <button type="submit" class="btn-save" [disabled]="isSaving || editForm.invalid">
+          {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
       </div>
 
     </form>

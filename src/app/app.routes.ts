@@ -6,6 +6,8 @@ import { ItineraryComponent } from './pages/itinerary/itinerary';
 import { ExpensesComponent } from './pages/expenses/expenses';
 import { MemoriesComponent } from './pages/memories/memories';
 import { RegisterComponent } from './pages/register/register';
+import { FriendsComponent } from './pages/friends/friends';
+import { ChatsComponent } from './pages/chats/chats';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -16,5 +18,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent }, // <--- NUEVA RUTA
   { path: 'expenses', component: ExpensesComponent },
   { path: 'memories', component: MemoriesComponent },
+  { path: 'chats', component: ChatsComponent },
+  { path: 'friends', component: FriendsComponent },
   { path: '**', redirectTo: 'login' }
 ];

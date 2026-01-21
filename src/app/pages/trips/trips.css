@@ -1,0 +1,411 @@
+/* =========================================
+   CONTENEDOR PRINCIPAL
+   ========================================= */
+   .page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #333;
+    padding-bottom: 80px; /* Espacio para el botón flotante del chat */
+  }
+  
+  /* --- Header --- */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #111827;
+  }
+  
+  .subtitle {
+    color: #6b7280;
+    margin: 0.5rem 0 0 0;
+  }
+
+  /* NUEVO: Contenedor de botones de cabecera */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* NUEVO: Botón de añadir amigo */
+  .btn-icon-add {
+    background-color: #eff6ff;
+    color: #4f46e5;
+    border: 1px solid #dbeafe;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+  }
+
+  .btn-icon-add:hover {
+    background-color: #dbeafe;
+    transform: translateY(-2px);
+  }
+  
+  /* --- Estados (Loading, Error, Empty) --- */
+  .info, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .error {
+    color: #ef4444;
+    background: #fef2f2;
+    border-radius: 8px;
+    border: 1px solid #fee2e2;
+  }
+  
+  .empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f9fafb;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+    color: #6b7280;
+  }
+  
+  .empty h3 {
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* =========================================
+     GRID DE VIAJES (TARJETAS)
+     ========================================= */
+  .grid {
+    display: grid;
+    /* Crea columnas automáticas de mínimo 300px */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+  
+  .trip-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .trip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Imagen de la tarjeta */
+  .trip-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  /* Cuerpo de la tarjeta */
+  .trip-body {
+    padding: 1.2rem;
+    flex: 1; /* Para que crezca y empuje el footer si hiciera falta */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Título y Fechas */
+  .trip-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+  }
+  
+  .trip-title h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #111827;
+    font-weight: 700;
+  }
+  
+  .trip-dates {
+    font-size: 0.8rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  
+  /* Subtítulo (Origen/Nombre) */
+  .trip-sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .pill {
+    font-size: 0.75rem;
+    color: #4b5563;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+  
+  /* Miembros (Avatares) */
+  .members {
+    margin-top: auto; /* Empuja hacia abajo si hay espacio */
+    padding-top: 1rem;
+  }
+  
+  .avatars {
+    display: flex;
+    align-items: center;
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+    margin-left: -10px; /* Efecto solapado */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .avatar:first-child {
+    margin-left: 0;
+  }
+  
+  .more {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 600;
+  }
+  
+  /* Botones de acción en la tarjeta */
+  .actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+  }
+  
+  /* =========================================
+     BOTONES GENERALES
+     ========================================= */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+  
+  /* Botón Primario (Azul) */
+  .primary {
+    background-color: #007adf;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 122, 223, 0.2);
+  }
+  
+  .primary:hover:not(:disabled) {
+    background-color: #005bb5;
+  }
+  
+  .primary:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+  }
+  
+  /* Botón Ghost (Gris/Transparente) */
+  .ghost {
+    background: transparent;
+    color: #007adf;
+    width: 100%;
+    border: 1px solid #eff6ff;
+  }
+  
+  .ghost:hover {
+    background: #eff6ff;
+  }
+  
+  .icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #6b7280;
+  }
+  
+  /* =========================================
+     MODAL (POPUP CREAR VIAJE)
+     ========================================= */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+  
+  .modal {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #111827;
+  }
+  
+  /* Formulario del Modal */
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  /* Filas de dos columnas */
+  .row.two {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .row.two > div {
+    flex: 1;
+  }
+  
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box; /* Importante */
+    transition: border-color 0.2s;
+  }
+  
+  input:focus {
+    border-color: #007adf;
+  }
+  
+  /* Validaciones */
+  .field-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 2px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Botón flotante del chat (FAB) */
+  .fab-chat {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.2s;
+    z-index: 900;
+  }
+
+  .fab-chat:hover {
+    transform: scale(1.1);
+    background-color: #4338ca;
+  }
+
+  /* Badge de notificación */
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid white;
+    padding: 2px;
+  }

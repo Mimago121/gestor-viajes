@@ -1,0 +1,282 @@
+.friends-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+header p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* --- Buscador y Dropdown --- */
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-wrapper {
+  position: relative; /* Clave para el dropdown */
+  width: 100%;
+  max-width: 600px;
+  margin: 0;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  padding: 0 15px;
+  transition: border-color 0.3s;
+}
+
+.search-box:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.search-box input {
+  flex: 1;
+  padding: 14px 0;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+/* El Desplegable Flotante */
+.dropdown-results {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-results.empty {
+  padding: 1rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Items dentro del dropdown */
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f9fafb;
+}
+
+.user-data {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-data img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+.user-data div {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.user-data strong {
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.user-data small {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Botón pequeño de añadir */
+.btn-mini-add {
+  background-color: #eff6ff;
+  color: #4f46e5;
+  border: 1px solid #dbeafe;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-mini-add:hover {
+  background-color: #4f46e5;
+  color: white;
+}
+
+
+/* --- Grid de Amigos (Existente) --- */
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 1rem;
+}
+
+.friend-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.friend-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.friend-card img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid #f3f4f6;
+}
+
+.friend-info h4 {
+  margin: 5px 0;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.friend-info small {
+  color: #6b7280;
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* --- Botones --- */
+.btn-chat {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* --- Solicitudes --- */
+.divider {
+  border: 0;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 3rem 0;
+}
+
+.requests-section {
+  background: #fffbeb;
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 3rem;
+  border: 1px solid #fcd34d;
+}
+
+.request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.req-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.req-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.req-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-accept {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 16px;
+  border: 2px dashed #e5e7eb;
+}

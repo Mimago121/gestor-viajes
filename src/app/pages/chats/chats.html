@@ -1,0 +1,31 @@
+<div class="chats-container">
+  <div class="header-chat">
+    <h1>Mensajes 💬</h1>
+  </div>
+  
+  <div *ngIf="loading" class="loading-state">
+    <p>Cargando conversaciones...</p>
+  </div>
+
+  <div class="chat-list" *ngIf="!loading && chats.length > 0">
+    <div class="chat-item" *ngFor="let chat of chats" (click)="openChat(chat.id)">
+      <img [src]="chat.avatar" class="avatar">
+      <div class="info">
+        <h3>{{ chat.name }}</h3>
+        <p>{{ chat.lastMessage }}</p>
+      </div>
+      <div class="status" *ngIf="chat.unread">🔴</div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && chats.length === 0">
+    <div class="icon-placeholder">👥</div>
+    <h2>No tienes amigos</h2>
+    <p>Debes conocer personas para poder chatear.</p>
+    
+    <a routerLink="/friends" class="btn-find-friends">
+      Buscar Personas
+    </a>
+  </div>
+
+</div>
