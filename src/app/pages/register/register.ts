@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router'; // RouterModule para poder volver al login
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+// Importamos todo lo necesario de Firestore
 import { Firestore, collection, query, where, getDocs, doc, setDoc } from '@angular/fire/firestore';
 
 @Component({
@@ -10,12 +11,12 @@ import { Firestore, collection, query, where, getDocs, doc, setDoc } from '@angu
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrls: ['./register.css'], // Usaremos el mismo estilo que login
+  styleUrls: ['./register.css'] // Asegúrate de tener el CSS que te pasé antes
 })
 export class RegisterComponent {
   registerForm: FormGroup;
   isLoading = false;
-
+  
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -25,17 +26,9 @@ export class RegisterComponent {
 
   constructor() {
     this.registerForm = this.fb.group({
-      username: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          // ESTA ES LA REGLA NUEVA: Solo letras (a-z), números (0-9) y guiones bajos (_)
-          Validators.pattern(/^[a-zA-Z0-9_]+$/),
-        ],
-      ],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]], 
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -47,15 +40,15 @@ export class RegisterComponent {
 
     this.isLoading = true;
     const { email, password, username } = this.registerForm.value;
-    const usernameLimpio = username.trim().toLowerCase();
-    const usernameConArroba = '@' + usernameLimpio.replace('@', '');
+    const usernameLimpio = username.trim().toLowerCase(); 
+    
+    // Le ponemos la @ visualmente para guardarlo
+    const usernameConArroba = '@' + usernameLimpio.replace('@', ''); 
 
     try {
-      // 1. VERIFICAR SI EXISTE EL USUARIO EN FIREBASE
+      // 1. VERIFICAR SI YA EXISTE EL NOMBRE EN LA BASE DE DATOS
       const usersRef = collection(this.firestore, 'users');
       const q = query(usersRef, where('username', '==', usernameConArroba));
-
-      // OJO AQUÍ: Si falla aquí, mira la consola del navegador (F12)
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -64,34 +57,36 @@ export class RegisterComponent {
         return;
       }
 
-      // 2. CREAR CUENTA
+      // 2. CREAR CUENTA EN AUTH (Email y Contraseña)
       const credencial = await this.authService.register(email, password);
       const uid = credencial.user.uid;
 
-      // 3. GUARDAR PERFIL
+      // 3. ¡AQUÍ SE CREA LA COLECCIÓN! 
+      // Guardamos el documento con el mismo ID que el usuario
       const nuevoPerfil = {
-        name: usernameLimpio,
+        uid: uid, // Guardamos también el ID dentro por si acaso
+        name: usernameLimpio, 
         username: usernameConArroba,
         email: email,
         bio: '¡Hola! Soy nuevo en TripShare.',
         avatar: this.defaultAvatar,
         stats: { trips: 0, countries: 0, friends: 0 },
-        nextTrip: { destination: 'Planificar viaje', date: 'Pronto' },
+        nextTrip: { destination: 'Sin planificar', date: '' },
+        createdAt: new Date()
       };
 
+      // Esta línea crea la colección 'users' si no existe
       await setDoc(doc(this.firestore, 'users', uid), nuevoPerfil);
 
       alert('¡Cuenta creada! Bienvenido.');
-      this.router.navigate(['/trips']);
-    } catch (error: any) {
-      console.error('ERROR REGISTRO:', error); // <--- IMPORTANTE MIRAR ESTO
+      this.router.navigate(['/profile']); // Te mando al perfil para que lo veas
 
+    } catch (error: any) {
+      console.error("Error:", error);
       if (error.code === 'auth/email-already-in-use') {
-        alert('Este correo ya está registrado.');
-      } else if (error.message && error.message.includes('index')) {
-        alert('Falta crear un índice en Firebase. Mira la consola (F12) y haz clic en el enlace.');
+        alert('Ese correo ya está registrado.');
       } else {
-        alert('Error al registrarse: ' + error.message);
+        alert('Error al registrarse. Mira la consola.');
       }
     } finally {
       this.isLoading = false;
