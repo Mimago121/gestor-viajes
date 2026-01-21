@@ -1,0 +1,396 @@
+.detail-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f3f4f6; /* Fondo gris suave para toda la página */
+  min-height: 100vh;
+}
+
+/* --- HERO (Cabecera con imagen) --- */
+.hero {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  /* Sin bordes redondeados arriba para que pegue con el menú */
+}
+
+.hero-overlay {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.btn-back {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+/* --- SECCIÓN DE MIEMBROS (La tarjeta flotante) --- */
+.members-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: white;
+  margin: -40px 20px 20px 20px; /* Margen negativo para subirlo sobre la foto */
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 10; /* Para que flote sobre el hero */
+}
+
+.members-list {
+  display: flex;
+  align-items: center;
+}
+
+.member-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 3px solid white;
+  object-fit: cover;
+  margin-right: -12px; /* Efecto solapado */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.member-avatar:hover {
+  transform: translateY(-3px);
+  z-index: 5;
+}
+
+.btn-add-member {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: white;
+  border: 3px solid white;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 5px;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+  transition: transform 0.2s;
+}
+
+.btn-add-member:hover {
+  transform: scale(1.1);
+  background: #4338ca;
+}
+
+.trip-meta h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.badge {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* --- ITINERARIO --- */
+.itinerary {
+  padding: 0 20px;
+}
+
+.itinerary h3 {
+  color: #374151;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+.days-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.day-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 10px;
+}
+
+.day-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.btn-mini {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-mini:hover {
+  background: #dcfce7;
+}
+
+/* Lista de Actividades */
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border-left: 4px solid #ccc;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.activity-item:hover {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transform: translateX(2px);
+}
+
+/* Colores según tipo */
+.activity-item.sightseeing { border-left-color: #f59e0b; } /* Naranja */
+.activity-item.food { border-left-color: #ef4444; } /* Rojo */
+.activity-item.transport { border-left-color: #3b82f6; } /* Azul */
+.activity-item.party { border-left-color: #8b5cf6; } /* Morado */
+
+.time {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #6b7280;
+  min-width: 45px;
+}
+
+.act-info strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.act-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.btn-icon-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: none;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0; /* Oculto por defecto */
+  transition: opacity 0.2s;
+}
+
+.activity-item:hover .btn-icon-del {
+  opacity: 1; /* Visible al pasar el ratón */
+}
+
+.btn-icon-del:hover { color: #ef4444; }
+
+.empty-day {
+  text-align: center;
+  padding: 20px;
+  color: #9ca3af;
+  font-style: italic;
+  border: 2px dashed #e5e7eb;
+  border-radius: 10px;
+}
+
+
+/* =========================================
+   ESTILOS DE LOS MODALES (¡AQUÍ ESTÁ LA CLAVE!)
+   ========================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Fondo oscuro */
+  backdrop-filter: blur(4px); /* Efecto borroso de fondo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* ¡MUY ALTO PARA QUE SE VEA! */
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal h3 {
+  margin-top: 0;
+  color: #111827;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos específicos para la lista de amigos en el modal */
+.friends-list-modal {
+  max-height: 300px; /* Altura máxima */
+  overflow-y: auto;  /* Scroll si hay muchos amigos */
+  margin-top: 15px;
+  padding-right: 5px; /* Espacio para el scroll */
+}
+
+.friend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.friend-row:last-child { border-bottom: none; }
+
+.f-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mini-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-invite {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.btn-invite:hover {
+  background: #4338ca;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+/* Formularios */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 0.9rem; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.form-group textarea { min-height: 80px; resize: vertical; }
+
+.btn-save {
+  background: #10b981;
+  color: white;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.btn-save:hover { background: #059669; }
+
+/* Loading */
+.loading-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: white; z-index: 20000;
+  display: flex; justify-content: center; align-items: center;
+}
+.spinner {
+  width: 40px; height: 40px; border: 4px solid #f3f3f3;
+  border-top: 4px solid #4f46e5; border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

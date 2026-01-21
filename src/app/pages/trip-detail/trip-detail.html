@@ -1,0 +1,109 @@
+<div class="loading-screen" *ngIf="loading">
+  <div class="spinner"></div>
+</div>
+
+<div class="detail-container" *ngIf="trip">
+  
+  <div class="hero" [style.backgroundImage]="'url(' + (trip.imageUrl || 'https://via.placeholder.com/1200x400') + ')'">
+    <div class="hero-overlay">
+      <button class="btn-back" routerLink="/trips">← Volver</button>
+      <h1>{{ trip.destination }}</h1>
+      <p>{{ trip.startDate | date }} - {{ trip.endDate | date }}</p>
+    </div>
+  </div>
+
+  <div class="members-section">
+    <div class="members-list">
+      <img *ngFor="let m of trip.members" [src]="m.avatarUrl" [title]="m.name" class="member-avatar">
+      
+      <button class="btn-add-member" (click)="openInviteModal()">+</button>
+      
+    </div>
+    <div class="trip-meta">
+      <h2>{{ trip.name }}</h2>
+      <span class="badge">{{ trip.origin }} ✈️ {{ trip.destination }}</span>
+    </div>
+  </div>
+
+  <div class="itinerary">
+    <h3>Itinerario de viaje 🗺️</h3>
+    
+    <div class="days-container">
+      <div class="day-card" *ngFor="let day of daysArray">
+        <div class="day-header">
+          <h4>Día {{ day }}</h4>
+          <button class="btn-mini" (click)="openAddActivity(day)">+ Actividad</button>
+        </div>
+
+        <div class="activities-list">
+          <div *ngFor="let act of getActivitiesForDay(day)" class="activity-item" [ngClass]="act.type">
+            <span class="time">{{ act.time }}</span>
+            <div class="act-info">
+              <strong>{{ act.title }}</strong>
+              <p *ngIf="act.description">{{ act.description }}</p>
+            </div>
+            <button class="btn-icon-del" (click)="deleteActivity(act.id)">×</button>
+          </div>
+          
+          <div *ngIf="getActivitiesForDay(day).length === 0" class="empty-day">
+            <small>Sin planes aún</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="showActivityModal" (click)="showActivityModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Plan para el Día {{ selectedDay }}</h3>
+    <form [formGroup]="activityForm" (ngSubmit)="saveActivity()">
+      <div class="form-group">
+        <label>Hora</label>
+        <input type="time" formControlName="time">
+      </div>
+      <div class="form-group">
+        <label>Título</label>
+        <input type="text" formControlName="title" placeholder="Ej: Visita al Museo">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select formControlName="type">
+          <option value="sightseeing">🏛️ Turismo</option>
+          <option value="food">🍕 Comida</option>
+          <option value="transport">🚌 Transporte</option>
+          <option value="party">🎉 Fiesta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notas</label>
+        <textarea formControlName="description"></textarea>
+      </div>
+      <button class="btn-save">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showInviteModal" (click)="showInviteModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Invitar Amigos</h3>
+    <p>Añade compañeros a este viaje:</p>
+    
+    <div class="friends-list-modal">
+      <div *ngFor="let f of myFriends" class="friend-row">
+        <div class="f-info">
+          <img [src]="f.avatar || 'https://via.placeholder.com/30'" class="mini-avatar">
+          <span>{{ f.name }}</span>
+        </div>
+        <button class="btn-invite" (click)="inviteFriend(f)">Añadir</button>
+      </div>
+      
+      <div *ngIf="myFriends.length === 0" class="empty-msg">
+        <p>No tienes amigos disponibles para invitar :</p>
+        <p><small>¡Ve a la sección Comunidad para añadir gente!</small></p>
+      </div>
+
+    </div>
+  </div>
+</div>

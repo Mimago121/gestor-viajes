@@ -11,6 +11,7 @@ import { ChatsComponent } from './pages/chats/chats';
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard';
 import { ChatRoomComponent } from './pages/chat-room/chat-room';
 import { adminGuard } from './guards/admin.guard';
+import { TripDetailComponent } from './pages/trip-detail/trip-detail';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'memories', component: MemoriesComponent },
   { path: 'chats', component: ChatsComponent },
   { path: 'chat/:uid', component: ChatRoomComponent },
+  { path: 'trips/:id', component: TripDetailComponent },
   { path: 'friends', component: FriendsComponent },
   {
     path: 'admin',
