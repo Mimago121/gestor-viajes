@@ -554,3 +554,108 @@
   cursor: pointer;
   background: white;
 }
+
+/* --- ESTILOS DE INVITACIONES --- */
+.invitations-section {
+  margin-bottom: 40px;
+  background: #f0fdf4; /* Fondo verde muy suave */
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #bbf7d0;
+}
+
+.invitations-section h2 {
+  font-size: 1.2rem;
+  color: #166534;
+  margin-bottom: 15px;
+}
+
+.invites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.invite-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+}
+
+.invite-img-wrapper {
+  position: relative;
+  height: 140px;
+}
+
+.invite-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.invite-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f59e0b;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.invite-content {
+  padding: 15px;
+}
+
+.invite-content h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.invite-dates {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+}
+
+.invite-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept, .btn-reject {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-accept {
+  background: #22c55e;
+  color: white;
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-accept:hover { background: #16a34a; }
+.btn-reject:hover { background: #dc2626; }
+
+.section-divider {
+  border: 0;
+  border-top: 2px dashed #cbd5e1;
+  margin: 40px 0 20px 0;
+}

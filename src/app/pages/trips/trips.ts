@@ -4,8 +4,10 @@ import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Trip } from '../../interfaces/Trip';
 import { MemberMini } from '../../interfaces/MemberMini';
-// AÑADIDO: getDocs para leer las plantillas
-import { Firestore, collection, addDoc, query, orderBy, onSnapshot, where, getDocs } from '@angular/fire/firestore';
+import { 
+  Firestore, collection, addDoc, query, orderBy, onSnapshot, where, getDocs, 
+  doc, updateDoc, arrayUnion, arrayRemove // <--- AÑADIDOS para editar invitaciones
+} from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
 import { User } from '@angular/fire/auth';
 
@@ -22,23 +24,21 @@ export class TripsComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  trips: Trip[] = [];
-  // NUEVO: Array para guardar las plantillas del admin
-  templates: any[] = []; 
+  // --- CAMBIO: Listas separadas ---
+  myTrips: Trip[] = [];
+  pendingTrips: Trip[] = [];
   
+  templates: any[] = []; 
   loading = true;
   errorMsg = '';
   
-  // Control del Modal
   isCreateOpen = false;
-  // NUEVO: Controla si estamos viendo la lista de plantillas o el formulario
   showTemplateSelection = true; 
 
   submitting = false;
   tripForm!: FormGroup;
   currentUser: MemberMini | null = null;
 
-  // --- VARIABLES PARA NOTIFICACIONES ---
   hasNotifications = false;
   notificationCount = 0;
 
@@ -66,13 +66,8 @@ export class TripsComponent implements OnInit {
           avatarUrl: user.photoURL || this.defaultUserAvatar, 
         };
         
-        // 1. Cargar viajes
         this.loadTripsRealtime();
-        
-        // 2. ESCUCHAR NOTIFICACIONES (Solicitudes de amistad)
         this.listenForNotifications(user.uid);
-
-        // 3. NUEVO: Cargar plantillas del admin
         this.loadTemplates();
         
       } else {
@@ -81,7 +76,6 @@ export class TripsComponent implements OnInit {
     });
   }
 
-  // --- NUEVO: CARGAR PLANTILLAS DEL ADMIN ---
   async loadTemplates() {
     try {
       const q = query(collection(this.firestore, 'trip_templates'));
@@ -92,7 +86,6 @@ export class TripsComponent implements OnInit {
     }
   }
 
-  // --- LÓGICA DE NOTIFICACIONES ---
   listenForNotifications(uid: string) {
     const requestsRef = collection(this.firestore, 'friend_requests');
     const q = query(requestsRef, where('toUid', '==', uid), where('status', '==', 'pending'));
@@ -107,29 +100,22 @@ export class TripsComponent implements OnInit {
     this.router.navigate(['/chats']); 
   }
 
-  // ---------- UI actions ----------
   openCreate(): void {
     this.errorMsg = '';
     this.isCreateOpen = true;
-    this.showTemplateSelection = true; // Empezamos mostrando la selección
+    this.showTemplateSelection = true;
     this.tripForm.reset();
   }
 
-  // --- NUEVO: SELECCIONAR PLANTILLA ---
   selectTemplate(template: any | null) {
-    this.showTemplateSelection = false; // Ocultamos selección, mostramos formulario
-
+    this.showTemplateSelection = false;
     if (template) {
-      // Si eligió plantilla, rellenamos el formulario con sus datos
       this.tripForm.patchValue({
         destination: template.destination,
-        // Usamos la descripción de la plantilla como nombre sugerido
         name: template.description || `Viaje a ${template.destination}`,
         imageUrl: template.imageUrl,
-        // Dejamos origen y fechas vacíos para que el usuario elija
       });
     } else {
-      // Si es null, es "Viaje en blanco", reseteamos
       this.tripForm.reset();
     }
   }
@@ -146,20 +132,38 @@ export class TripsComponent implements OnInit {
     }
   }
 
-  // ---------- Data ----------
+  // ---------- CARGA DE VIAJES MODIFICADA ----------
   loadTripsRealtime(): void {
     this.loading = true;
     const tripsRef = collection(this.firestore, 'trips');
     const q = query(tripsRef, orderBy('createdAt', 'desc'));
 
     onSnapshot(q, (snapshot) => {
-        this.trips = snapshot.docs.map((doc) => {
+        const allTrips = snapshot.docs.map((doc) => {
           const data = doc.data() as any;
-          return {
-            id: doc.id,
-            ...data,
-          } as Trip;
+          return { id: doc.id, ...data } as Trip;
         });
+
+        // FILTRADO EN MEMORIA
+        this.myTrips = [];
+        this.pendingTrips = [];
+
+        if (this.currentUser) {
+          allTrips.forEach(trip => {
+            // Buscamos si soy miembro
+            const membership = trip.members?.find((m: any) => m.id === this.currentUser?.id);
+            
+            if (membership) {
+              if (membership.status === 'pending') {
+                this.pendingTrips.push(trip);
+              } else {
+                // Si es 'accepted' o no tiene status (creador/antiguo), es mío
+                this.myTrips.push(trip);
+              }
+            }
+          });
+        }
+        
         this.loading = false;
       },
       (error) => {
@@ -169,6 +173,42 @@ export class TripsComponent implements OnInit {
     );
   }
 
+  // ---------- NUEVAS FUNCIONES: ACEPTAR / RECHAZAR ----------
+  async acceptInvite(trip: Trip) {
+    if (!this.currentUser) return;
+    const tripRef = doc(this.firestore, 'trips', trip.id!);
+    
+    // Buscar mi objeto "pending" antiguo
+    const myMemberOld = trip.members?.find((m: any) => m.id === this.currentUser?.id);
+    
+    // Crear el nuevo con estado aceptado
+    const myMemberNew = { ...myMemberOld, status: 'accepted' };
+
+    try {
+      // Borrar el viejo y poner el nuevo (Atomicity simulada)
+      await updateDoc(tripRef, { members: arrayRemove(myMemberOld) });
+      await updateDoc(tripRef, { members: arrayUnion(myMemberNew) });
+      // El snapshot actualizará la UI automáticamente
+    } catch (e) {
+      console.error("Error al aceptar", e);
+    }
+  }
+
+  async rejectInvite(trip: Trip) {
+    if (!this.currentUser) return;
+    if(!confirm(`¿Rechazar invitación a ${trip.destination}?`)) return;
+
+    const tripRef = doc(this.firestore, 'trips', trip.id!);
+    const myMember = trip.members?.find((m: any) => m.id === this.currentUser?.id);
+    
+    try {
+      await updateDoc(tripRef, { members: arrayRemove(myMember) });
+    } catch (e) {
+      console.error("Error al rechazar", e);
+    }
+  }
+
+  // ---------- CREACIÓN ----------
   async createTrip(): Promise<void> {
     if (this.tripForm.invalid) {
       this.tripForm.markAllAsTouched();
@@ -187,7 +227,8 @@ export class TripsComponent implements OnInit {
         startDate: v.startDate,
         endDate: v.endDate,
         imageUrl: v.imageUrl?.trim() || null,
-        members: [this.currentUser], 
+        creatorId: this.currentUser.id, // Guardamos quién creó el viaje
+        members: [{ ...this.currentUser, status: 'accepted' }], // El creador entra aceptado
         createdAt: Date.now(), 
       };
 
@@ -203,37 +244,28 @@ export class TripsComponent implements OnInit {
     }
   }
 
-  getTripImage(trip: Trip): string {
-    return trip.imageUrl || this.fallbackTripImg;
-  }
-
+  // ... (Tus helpers de formato e imágenes siguen igual) ...
+  getTripImage(trip: Trip): string { return trip.imageUrl || this.fallbackTripImg; }
   formatDateRange(startIso: string, endIso: string): string {
     const s = this.formatIsoDate(startIso);
     const e = this.formatIsoDate(endIso);
     return `${s} - ${e}`;
   }
-
   private formatIsoDate(iso: string): string {
     if (!iso) return '';
     const [y, m, d] = iso.split('-');
     return `${d}/${m}/${y}`;
   }
-
-  visibleMembers(trip: Trip): MemberMini[] {
-    return trip.members ? trip.members.slice(0, 3) : [];
-  }
-
-  extraMembersCount(trip: Trip): number {
-    return trip.members ? Math.max(0, trip.members.length - 3) : 0;
-  }
-
+  visibleMembers(trip: Trip): MemberMini[] { return trip.members ? trip.members.slice(0, 3) : []; }
+  extraMembersCount(trip: Trip): number { return trip.members ? Math.max(0, trip.members.length - 3) : 0; }
+  
+  // Validadores
   private dateRangeValidator(group: AbstractControl): ValidationErrors | null {
     const start = group.get('startDate')?.value;
     const end = group.get('endDate')?.value;
     if (!start || !end) return null;
     return end >= start ? null : { dateRange: true };
   }
-
   private originDestinationValidator(group: AbstractControl): ValidationErrors | null {
     const o = (group.get('origin')?.value || '').trim().toLowerCase();
     const d = (group.get('destination')?.value || '').trim().toLowerCase();

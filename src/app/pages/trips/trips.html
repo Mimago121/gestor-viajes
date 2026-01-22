@@ -2,7 +2,7 @@
   <div class="header">
     <div>
       <h1>Mis viajes</h1>
-      <p class="subtitle">Crea un viaje y organiza el plan con tu grupo.</p>
+      <p class="subtitle">Gestiona tus aventuras y acepta nuevas invitaciones.</p>
     </div>
 
     <div class="header-actions">
@@ -14,17 +14,37 @@
   </div>
 
   <div *ngIf="loading" class="info">Cargando viajes...</div>
-
   <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
-  <div *ngIf="!loading && trips.length === 0" class="empty">
+  <div class="invitations-section" *ngIf="!loading && pendingTrips.length > 0">
+    <h2>📩 Invitaciones Pendientes</h2>
+    <div class="invites-grid">
+      <div class="invite-card" *ngFor="let trip of pendingTrips">
+        <div class="invite-img-wrapper">
+          <img [src]="getTripImage(trip)" alt="Destino">
+          <span class="invite-badge">Invitación</span>
+        </div>
+        <div class="invite-content">
+          <h3>{{ trip.destination }}</h3>
+          <p class="invite-dates">{{ formatDateRange(trip.startDate, trip.endDate) }}</p>
+          <div class="invite-actions">
+            <button class="btn-accept" (click)="acceptInvite(trip)">Aceptar ✅</button>
+            <button class="btn-reject" (click)="rejectInvite(trip)">Rechazar ❌</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="section-divider">
+  </div>
+
+  <div *ngIf="!loading && myTrips.length === 0 && pendingTrips.length === 0" class="empty">
     <h3>No tienes viajes todavía</h3>
     <p>Crea tu primer viaje para empezar a organizarlo.</p>
     <button class="btn primary" (click)="openCreate()">Crear viaje</button>
   </div>
 
-  <div class="grid" *ngIf="!loading && trips.length > 0">
-    <div class="trip-card" *ngFor="let trip of trips">
+  <div class="grid" *ngIf="!loading && myTrips.length > 0">
+    <div class="trip-card" *ngFor="let trip of myTrips">
       <img class="trip-img" [src]="getTripImage(trip)" alt="Imagen del destino" />
 
       <div class="trip-body">

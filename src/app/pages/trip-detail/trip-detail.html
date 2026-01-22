@@ -1,6 +1,4 @@
-<div class="loading-screen" *ngIf="loading">
-  <div class="spinner"></div>
-</div>
+<div class="loading-screen" *ngIf="loading"><div class="spinner"></div></div>
 
 <div class="detail-container" *ngIf="trip">
   
@@ -14,141 +12,113 @@
 
   <div class="members-section">
     <div class="members-list">
-      <img *ngFor="let m of trip.members" [src]="m.avatarUrl" [title]="m.name" class="member-avatar">
-      <button class="btn-add-member" (click)="openInviteModal()">+</button>
+      
+      <div *ngFor="let m of trip.members" class="member-chip" [class.pending]="m.status === 'pending'">
+        <img [src]="m.avatarUrl" [title]="m.name" class="member-avatar">
+        
+        <span *ngIf="trip.creatorId === m.id" class="crown-icon" title="Líder del viaje">👑</span>
+        
+        <span *ngIf="m.status === 'pending'" class="status-badge">⏳</span>
+
+        <button *ngIf="isLeader && trip.creatorId !== m.id" 
+                class="btn-kick" (click)="removeMember(m)" title="Expulsar">
+          ❌
+        </button>
+      </div>
+
+      <button *ngIf="isLeader" class="btn-add-member" (click)="openInviteModal()">+</button>
     </div>
+
     <div class="trip-meta">
       <h2>{{ trip.name }}</h2>
-      <span class="badge">{{ trip.origin }} ✈️ {{ trip.destination }}</span>
+      <span class="badge" *ngIf="isLeader">Eres el Líder 😎</span>
     </div>
   </div>
 
   <div class="tabs-container">
-    <button class="tab-btn" [class.active]="activeTab === 'itinerary'" (click)="activeTab = 'itinerary'">
+    <button class="tab-btn" [class.active]="activeTab === 'itinerary'" (click)="switchTab('itinerary')">
       🗺️ Itinerario
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'expenses'" (click)="activeTab = 'expenses'">
+    <button class="tab-btn" [class.active]="activeTab === 'expenses'" (click)="switchTab('expenses')">
       💸 Gastos
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'map'" (click)="switchTab('map')">
+      📍 Mapa
     </button>
   </div>
 
   <div class="itinerary" *ngIf="activeTab === 'itinerary'">
     <div class="days-container">
-      <div class="day-card" *ngFor="let day of daysArray">
-        <div class="day-header">
-          <h4>Día {{ day }}</h4>
-          <button class="btn-mini" (click)="openAddActivity(day)">+ Actividad</button>
-        </div>
-
-        <div class="activities-list">
-          <div *ngFor="let act of getActivitiesForDay(day)" class="activity-item" [ngClass]="act.type">
-            <span class="time">{{ act.time }}</span>
-            <div class="act-info">
-              <strong>{{ act.title }}</strong>
-              <p *ngIf="act.description">{{ act.description }}</p>
-            </div>
-            <button class="btn-icon-del" (click)="deleteActivity(act.id)">×</button>
+        <div class="day-card" *ngFor="let day of daysArray">
+          <div class="day-header">
+            <h4>Día {{ day }}</h4>
+            <button class="btn-mini" (click)="openAddActivity(day)">+ Actividad</button>
           </div>
-          
-          <div *ngIf="getActivitiesForDay(day).length === 0" class="empty-day">
-            <small>Sin planes aún</small>
+          <div class="activities-list">
+            <div *ngFor="let act of getActivitiesForDay(day)" class="activity-item" [ngClass]="act.type">
+              <span class="time">{{ act.time }}</span>
+              <div class="act-info"><strong>{{ act.title }}</strong><p>{{ act.description }}</p></div>
+              <button class="btn-icon-del" (click)="deleteActivity(act.id)">×</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   </div>
 
   <div class="expenses-section" *ngIf="activeTab === 'expenses'">
     <div class="expenses-header">
-      <div class="total-box">
-        <span>Total Gastado</span>
-        <strong>{{ getTotalExpenses() | currency:'EUR' }}</strong>
-      </div>
-      <button class="btn-primary" (click)="openAddExpense()">+ Nuevo Gasto</button>
+        <div class="total-box"><span>Total</span><strong>{{ getTotalExpenses() | currency:'EUR' }}</strong></div>
+        <button class="btn-primary" (click)="openAddExpense()">+ Gasto</button>
     </div>
-
     <div class="expenses-list">
-      <div class="expense-card" *ngFor="let expense of expenses">
-        <div class="expense-icon">💰</div>
-        <div class="expense-info">
-          <strong>{{ expense.title }}</strong>
-          <small>Pagado por: {{ getPayerName(expense.payerId) }} • {{ expense.date | date }}</small>
+        <div class="expense-card" *ngFor="let expense of expenses">
+          <div class="expense-icon">💰</div>
+          <div class="expense-info"><strong>{{ expense.title }}</strong><small>{{ getPayerName(expense.payerId) }}</small></div>
+          <div class="expense-amount">{{ expense.amount | currency:'EUR' }}</div>
+          <button class="btn-icon-del" (click)="deleteExpense(expense.id)">×</button>
         </div>
-        <div class="expense-amount">
-          {{ expense.amount | currency:'EUR' }}
-        </div>
-        <button class="btn-icon-del" (click)="deleteExpense(expense.id)">×</button>
-      </div>
-      
-      <div *ngIf="expenses.length === 0" class="empty-msg">
-        <p>Aún no hay gastos registrados.</p>
-      </div>
     </div>
   </div>
 
-</div>
-
-<div class="custom-overlay" *ngIf="showActivityModal" (click)="showActivityModal = false">
-  <div class="custom-modal" (click)="$event.stopPropagation()">
-    <h3>Plan para el Día {{ selectedDay }}</h3>
-    <form [formGroup]="activityForm" (ngSubmit)="saveActivity()">
-      <div class="form-group"><label>Hora</label><input type="time" formControlName="time"></div>
-      <div class="form-group"><label>Título</label><input type="text" formControlName="title" placeholder="Ej: Visita al Museo"></div>
-      <div class="form-group"><label>Tipo</label>
-        <select formControlName="type">
-          <option value="sightseeing">🏛️ Turismo</option>
-          <option value="food">🍕 Comida</option>
-          <option value="transport">🚌 Transporte</option>
-          <option value="party">🎉 Fiesta</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Notas</label><textarea formControlName="description"></textarea></div>
-      <button class="btn-save">Guardar</button>
-    </form>
+  <div class="map-section" *ngIf="activeTab === 'map'">
+    <div class="map-card">
+      <google-map height="500px" width="100%" [center]="mapCenter" [zoom]="mapZoom" [options]="mapOptions">
+        <map-marker *ngFor="let marker of markers" [position]="marker.position"></map-marker>
+      </google-map>
+    </div>
   </div>
+
 </div>
 
 <div class="custom-overlay" *ngIf="showInviteModal" (click)="showInviteModal = false">
   <div class="custom-modal" (click)="$event.stopPropagation()">
-    <h3>Invitar Amigos</h3>
+    <h3>Invitar (Solo Líder)</h3>
     <div class="friends-list-modal">
-      <div *ngFor="let f of myFriends" class="friend-row">
-        <div class="f-info">
-          <img [src]="f.avatar || 'https://via.placeholder.com/30'" class="mini-avatar">
-          <span>{{ f.name }}</span>
+        <div *ngFor="let f of myFriends" class="friend-row">
+            <div class="f-info"><img [src]="f.avatar" class="mini-avatar">{{ f.name }}</div>
+            <button class="btn-invite" (click)="inviteFriend(f)">Invitar</button>
         </div>
-        <button class="btn-invite" (click)="inviteFriend(f)">Añadir</button>
-      </div>
-      <div *ngIf="myFriends.length === 0" class="empty-msg">
-        <p>No tienes amigos disponibles para invitar :(</p>
-      </div>
     </div>
   </div>
 </div>
-
+<div class="custom-overlay" *ngIf="showActivityModal" (click)="showActivityModal = false">
+    <div class="custom-modal" (click)="$event.stopPropagation()">
+      <form [formGroup]="activityForm" (ngSubmit)="saveActivity()">
+        <h3>Nueva Actividad</h3>
+        <div class="form-group"><input type="time" formControlName="time"></div>
+        <div class="form-group"><input type="text" formControlName="title" placeholder="Título"></div>
+        <button class="btn-save">Guardar</button>
+      </form>
+    </div>
+</div>
 <div class="custom-overlay" *ngIf="showExpenseModal" (click)="showExpenseModal = false">
-  <div class="custom-modal" (click)="$event.stopPropagation()">
-    <h3>Registrar Gasto 💸</h3>
-    <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()">
-      <div class="form-group">
-        <label>Concepto</label>
-        <input type="text" formControlName="title" placeholder="Ej: Cena del viernes">
-      </div>
-      <div class="form-group">
-        <label>Cantidad (€)</label>
-        <input type="number" formControlName="amount" placeholder="0.00">
-      </div>
-      <div class="form-group">
-        <label>Pagado por</label>
-        <select formControlName="payerId">
-          <option *ngFor="let m of trip.members" [value]="m.id">{{ m.name }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" formControlName="date">
-      </div>
-      <button class="btn-save">Guardar Gasto</button>
-    </form>
-  </div>
+    <div class="custom-modal" (click)="$event.stopPropagation()">
+      <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()">
+        <h3>Nuevo Gasto</h3>
+        <div class="form-group"><input type="text" formControlName="title" placeholder="Concepto"></div>
+        <div class="form-group"><input type="number" formControlName="amount" placeholder="€"></div>
+        <div class="form-group"><select formControlName="payerId"><option *ngFor="let m of trip.members" [value]="m.id">{{ m.name }}</option></select></div>
+        <button class="btn-save">Guardar</button>
+      </form>
+    </div>
 </div>
