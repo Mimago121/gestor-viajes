@@ -2,7 +2,7 @@
   
   <header class="profile-header">
     <div class="avatar-section">
-      <img [src]="user.avatar" alt="Avatar" class="avatar-img">
+      <img [src]="user.avatar || defaultAvatar" alt="Avatar" class="avatar-img">
       <button class="edit-btn" (click)="openEditModal()">
         ✏️ Editar
       </button>
@@ -38,7 +38,8 @@
       <div class="trip-icon">✈️</div>
       <div class="trip-details">
         <h3>{{ user.nextTrip.destination }}</h3>
-        <p>{{ user.nextTrip.date }}</p>
+        <p *ngIf="user.nextTrip.date">{{ user.nextTrip.date | date:'mediumDate' }}</p>
+        <p *ngIf="!user.nextTrip.date">Sin fecha</p>
       </div>
     </div>
   </section>
@@ -53,6 +54,11 @@
     
     <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
       
+      <div class="form-group">
+        <label>URL de Avatar</label>
+        <input type="text" formControlName="avatar" placeholder="https://...">
+      </div>
+
       <div class="form-group">
         <label>Nombre</label>
         <input type="text" formControlName="name" placeholder="Tu nombre">

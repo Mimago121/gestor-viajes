@@ -5,7 +5,9 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 
 // Imports de Firebase
 import { AuthService } from '../../services/auth.service';
-import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
+import { 
+  Firestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy, limit 
+} from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
 
 @Component({
@@ -24,7 +26,7 @@ export class ProfileComponent implements OnInit {
 
   // Estado del modal y carga
   isEditing = false;
-  isSaving = false; // Para mostrar "Guardando..." en el botón
+  isSaving = false;
   editForm: FormGroup;
   currentUserUid: string | null = null;
 
@@ -36,15 +38,15 @@ export class ProfileComponent implements OnInit {
     bio: '...',
     avatar: this.defaultAvatar,
     stats: { trips: 0, countries: 0, friends: 0 },
-    nextTrip: { destination: '--', date: '--' }
+    nextTrip: { destination: 'Sin planes', date: '' }
   };
 
   constructor() {
-    // Inicializamos el formulario con validaciones
     this.editForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       username: ['', [Validators.required, Validators.minLength(3)]],
-      bio: ['', [Validators.maxLength(150)]] // Máximo 150 letras para la bio
+      bio: ['', [Validators.maxLength(150)]],
+      avatar: ['', Validators.required] // Añadido campo avatar
     });
   }
 
@@ -53,6 +55,7 @@ export class ProfileComponent implements OnInit {
       if (authUser) {
         this.currentUserUid = authUser.uid;
         await this.loadUserProfile(authUser);
+        await this.calculateRealStats(authUser.uid); // Calcular datos reales
       } else {
         this.router.navigate(['/login']);
       }
@@ -67,41 +70,91 @@ export class ProfileComponent implements OnInit {
       if (userSnapshot.exists()) {
         const data = userSnapshot.data();
         this.user = {
+          ...this.user, // Mantener defaults
           name: data['name'] || 'Viajero',
           username: data['username'] || '@usuario',
           bio: data['bio'] || 'Sin biografía',
           avatar: data['avatar'] || this.defaultAvatar,
-          stats: data['stats'] || { trips: 0, countries: 0, friends: 0 },
-          nextTrip: data['nextTrip'] || { destination: 'Sin planes', date: '' }
+          // stats se calculará aparte para ser real
         };
       } else {
-        // Auto-reparación si no existe documento
+        // Crear perfil si no existe
         const newProfile = {
           name: authUser.email?.split('@')[0] || 'Viajero',
           username: '@' + (authUser.email?.split('@')[0] || 'usuario'),
           bio: '¡Hola! Soy nuevo en TripShare.',
           avatar: this.defaultAvatar,
-          stats: { trips: 0, countries: 0, friends: 0 },
-          nextTrip: { destination: 'Planificar', date: '' }
+          friends: [] // Inicializar array amigos
         };
         await setDoc(userDocRef, newProfile);
-        this.user = newProfile;
+        this.user = { ...this.user, ...newProfile };
       }
     } catch (error) {
       console.error('Error cargando perfil:', error);
     }
   }
 
+  // --- CÁLCULO DE ESTADÍSTICAS REALES ---
+  async calculateRealStats(uid: string) {
+    try {
+      // 1. Contar Amigos (Array en el documento de usuario)
+      const userDoc = await getDoc(doc(this.firestore, `users/${uid}`));
+      const friends = userDoc.data()?.['friends'] || [];
+      this.user.stats.friends = friends.length;
+
+      // 2. Contar Viajes y buscar el Próximo
+      // Buscamos viajes donde el usuario esté en el array 'members' (necesita un índice compuesto a veces, 
+      // pero para empezar podemos buscar por creador o traer todos y filtrar si son pocos)
+      // OPCIÓN SIMPLE: Traer todos los viajes (colección trips) y filtrar en memoria 
+      // (En app real, usar 'array-contains' en query)
+      
+      const tripsRef = collection(this.firestore, 'trips');
+      // Consulta: Viajes futuros ordenados por fecha
+      const q = query(tripsRef, orderBy('startDate', 'asc')); 
+      const querySnapshot = await getDocs(q);
+      
+      let myTripsCount = 0;
+      let nextTripFound = false;
+      const today = new Date().toISOString().split('T')[0];
+
+      querySnapshot.forEach((doc) => {
+        const tripData = doc.data();
+        const members = tripData['members'] || [];
+        
+        // ¿Soy miembro de este viaje?
+        const isMember = members.some((m: any) => m.id === uid);
+
+        if (isMember) {
+          myTripsCount++;
+
+          // Buscar el viaje futuro más cercano
+          if (!nextTripFound && tripData['startDate'] >= today) {
+            this.user.nextTrip = {
+              destination: tripData['destination'],
+              date: tripData['startDate']
+            };
+            nextTripFound = true;
+          }
+        }
+      });
+
+      this.user.stats.trips = myTripsCount;
+      // Países es difícil de calcular sin una API externa, lo dejamos manual o a 0
+      
+    } catch (e) {
+      console.error("Error calculando stats", e);
+    }
+  }
+
   // --- FUNCIONES DEL MODAL ---
 
   openEditModal() {
-    // 1. Rellenamos el formulario con los datos actuales del usuario
     this.editForm.patchValue({
       name: this.user.name,
       username: this.user.username,
-      bio: this.user.bio
+      bio: this.user.bio,
+      avatar: this.user.avatar
     });
-    // 2. Mostramos el modal
     this.isEditing = true;
   }
 
@@ -117,22 +170,21 @@ export class ProfileComponent implements OnInit {
     const formValues = this.editForm.value;
 
     try {
-      // 1. Referencia al documento en Firebase
       const userDocRef = doc(this.firestore, `users/${this.currentUserUid}`);
 
-      // 2. Actualizamos SOLO los campos editados
       await updateDoc(userDocRef, {
         name: formValues.name,
         username: formValues.username,
-        bio: formValues.bio
+        bio: formValues.bio,
+        avatar: formValues.avatar
       });
 
-      // 3. Actualizamos la vista local (para que se vea rápido sin recargar)
+      // Actualizar vista local
       this.user.name = formValues.name;
       this.user.username = formValues.username;
       this.user.bio = formValues.bio;
+      this.user.avatar = formValues.avatar;
 
-      // 4. Cerramos
       this.isEditing = false;
       
     } catch (error) {
