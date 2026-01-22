@@ -15,9 +15,7 @@
   <div class="members-section">
     <div class="members-list">
       <img *ngFor="let m of trip.members" [src]="m.avatarUrl" [title]="m.name" class="member-avatar">
-      
       <button class="btn-add-member" (click)="openInviteModal()">+</button>
-      
     </div>
     <div class="trip-meta">
       <h2>{{ trip.name }}</h2>
@@ -55,8 +53,8 @@
 
 </div>
 
-<div class="modal-overlay" *ngIf="showActivityModal" (click)="showActivityModal = false">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="custom-overlay" *ngIf="showActivityModal" (click)="showActivityModal = false">
+  <div class="custom-modal" (click)="$event.stopPropagation()">
     <h3>Plan para el Día {{ selectedDay }}</h3>
     <form [formGroup]="activityForm" (ngSubmit)="saveActivity()">
       <div class="form-group">
@@ -85,8 +83,8 @@
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="showInviteModal" (click)="showInviteModal = false">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="custom-overlay" *ngIf="showInviteModal" (click)="showInviteModal = false">
+  <div class="custom-modal" (click)="$event.stopPropagation()">
     <h3>Invitar Amigos</h3>
     <p>Añade compañeros a este viaje:</p>
     
@@ -100,7 +98,7 @@
       </div>
       
       <div *ngIf="myFriends.length === 0" class="empty-msg">
-        <p>No tienes amigos disponibles para invitar :</p>
+        <p>No tienes amigos disponibles para invitar :(</p>
         <p><small>¡Ve a la sección Comunidad para añadir gente!</small></p>
       </div>
 

@@ -3,17 +3,16 @@
   margin: 0 auto;
   padding-bottom: 80px;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f3f4f6; /* Fondo gris suave para toda la página */
+  background-color: #f3f4f6;
   min-height: 100vh;
 }
 
-/* --- HERO (Cabecera con imagen) --- */
+/* --- HERO --- */
 .hero {
   height: 300px;
   background-size: cover;
   background-position: center;
   position: relative;
-  /* Sin bordes redondeados arriba para que pegue con el menú */
 }
 
 .hero-overlay {
@@ -51,18 +50,18 @@
   background: rgba(255,255,255,0.4);
 }
 
-/* --- SECCIÓN DE MIEMBROS (La tarjeta flotante) --- */
+/* --- MIEMBROS --- */
 .members-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 30px;
   background: white;
-  margin: -40px 20px 20px 20px; /* Margen negativo para subirlo sobre la foto */
+  margin: -40px 20px 20px 20px;
   border-radius: 16px;
   box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
   position: relative;
-  z-index: 10; /* Para que flote sobre el hero */
+  z-index: 10;
 }
 
 .members-list {
@@ -76,7 +75,7 @@
   border-radius: 50%;
   border: 3px solid white;
   object-fit: cover;
-  margin-right: -12px; /* Efecto solapado */
+  margin-right: -12px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s;
 }
@@ -178,7 +177,6 @@
   background: #dcfce7;
 }
 
-/* Lista de Actividades */
 .activities-list {
   display: flex;
   flex-direction: column;
@@ -202,11 +200,10 @@
   transform: translateX(2px);
 }
 
-/* Colores según tipo */
-.activity-item.sightseeing { border-left-color: #f59e0b; } /* Naranja */
-.activity-item.food { border-left-color: #ef4444; } /* Rojo */
-.activity-item.transport { border-left-color: #3b82f6; } /* Azul */
-.activity-item.party { border-left-color: #8b5cf6; } /* Morado */
+.activity-item.sightseeing { border-left-color: #f59e0b; }
+.activity-item.food { border-left-color: #ef4444; }
+.activity-item.transport { border-left-color: #3b82f6; }
+.activity-item.party { border-left-color: #8b5cf6; }
 
 .time {
   font-weight: 700;
@@ -236,12 +233,12 @@
   color: #9ca3af;
   font-size: 1.2rem;
   cursor: pointer;
-  opacity: 0; /* Oculto por defecto */
+  opacity: 0;
   transition: opacity 0.2s;
 }
 
 .activity-item:hover .btn-icon-del {
-  opacity: 1; /* Visible al pasar el ratón */
+  opacity: 1;
 }
 
 .btn-icon-del:hover { color: #ef4444; }
@@ -255,53 +252,65 @@
   border-radius: 10px;
 }
 
-
 /* =========================================
-   ESTILOS DE LOS MODALES (¡AQUÍ ESTÁ LA CLAVE!)
+   ESTILOS NUEVOS DE LOS MODALES (SOLUCIÓN)
    ========================================= */
 
-.modal-overlay {
+/* Usamos 'custom-' para evitar conflictos con otras librerías */
+.custom-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* Fondo oscuro */
-  backdrop-filter: blur(4px); /* Efecto borroso de fondo */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000; /* ¡MUY ALTO PARA QUE SE VEA! */
+  z-index: 99999; /* Máxima prioridad */
 }
 
-.modal {
+.custom-modal {
   background: white;
   padding: 25px;
   border-radius: 20px;
   width: 90%;
   max-width: 450px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideIn 0.3s ease-out;
+  
+  /* Forzamos que se vea */
+  display: block !important;
+  opacity: 1 !important;
 }
 
-@keyframes modalPop {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.modal h3 {
+.custom-modal h3 {
   margin-top: 0;
   color: #111827;
   font-size: 1.5rem;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
-/* Estilos específicos para la lista de amigos en el modal */
+.custom-modal p {
+  text-align: center;
+  color: #6b7280;
+}
+
 .friends-list-modal {
-  max-height: 300px; /* Altura máxima */
-  overflow-y: auto;  /* Scroll si hay muchos amigos */
+  max-height: 300px;
+  overflow-y: auto;
   margin-top: 15px;
-  padding-right: 5px; /* Espacio para el scroll */
+  padding-right: 5px;
+  border: 1px solid #f3f4f6; /* Borde sutil */
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .friend-row {
@@ -348,11 +357,8 @@
   text-align: center;
   padding: 20px;
   color: #6b7280;
-  background: #f9fafb;
-  border-radius: 10px;
 }
 
-/* Formularios */
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 0.9rem; }
 .form-group input, .form-group select, .form-group textarea {
