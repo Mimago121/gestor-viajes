@@ -17,7 +17,6 @@
   margin-top: 3rem;
 }
 
-/* Spinner animado */
 .spinner {
   width: 30px;
   height: 30px;
@@ -50,6 +49,13 @@
   border: 1px solid #e5e7eb;
   cursor: pointer;
   transition: transform 0.2s, background 0.2s;
+  position: relative; /* Para posicionamiento */
+}
+
+/* ESTILO PARA CHATS CON MENSAJES SIN LEER */
+.chat-item.has-unread {
+  background-color: #f0fdf4; /* Verde muy suave o blanco */
+  border-left: 4px solid #4f46e5; /* Borde izquierdo azul */
 }
 
 .chat-item:hover {
@@ -68,20 +74,44 @@
   flex: 1;
 }
 
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .info h3 {
   margin: 0;
   font-size: 1rem;
   color: #1f2937;
 }
 
-.info p {
+.msg-preview {
   margin: 5px 0 0 0;
   font-size: 0.85rem;
   color: #6b7280;
 }
 
-.status {
-  font-size: 0.5rem;
+.msg-unread {
+  margin: 5px 0 0 0;
+  font-size: 0.85rem;
+  color: #4f46e5; /* Color destacado */
+  font-weight: 600;
+}
+
+/* BURBUJA ROJA */
+.unread-badge {
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Empty State */

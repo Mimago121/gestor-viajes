@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { 
   Firestore, collection, addDoc, query, orderBy, onSnapshot, 
-  doc, setDoc, limit // <--- IMPORTANTE: AÑADIR LIMIT
+  doc, setDoc, limit 
 } from '@angular/fire/firestore';
 
 export interface ChatMessage {
   text: string;
   senderId: string;
+  toUid: string;       // <--- NUEVO: Para saber a quién notificar
+  read: boolean;       // <--- NUEVO: Para la burbujita roja
   createdAt: number;
 }
 
@@ -26,29 +28,41 @@ export class ChatService {
     const messagesRef = collection(this.firestore, `chats/${roomId}/messages`);
     
     // TRUCO DE VELOCIDAD:
-    // 1. Ordenamos por 'desc' (lo más nuevo primero).
-    // 2. Pedimos solo los últimos 50.
     const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(50));
 
     return onSnapshot(q, (snapshot) => {
-      const messages = snapshot.docs.map(doc => doc.data() as ChatMessage);
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as unknown as ChatMessage[];
       
-      // 3. Como vienen "del revés" (el más nuevo primero), les damos la vuelta
-      // para que en el chat el último mensaje salga abajo del todo.
+      // Les damos la vuelta para el chat
       callback(messages.reverse());
     });
   }
 
-  // Enviar mensaje
-  async sendMessage(roomId: string, text: string, senderId: string) {
-    const messagesRef = collection(this.firestore, `chats/${roomId}/messages`);
-    await addDoc(messagesRef, {
-      text,
-      senderId,
-      createdAt: Date.now()
-    });
+  // --- MODIFICADO: AHORA PIDE 'receiverId' ---
+  async sendMessage(roomId: string, text: string, senderId: string, receiverId: string) {
+    try {
+      const messagesRef = collection(this.firestore, `chats/${roomId}/messages`);
+      
+      // Guardamos datos clave para las notificaciones
+      await addDoc(messagesRef, {
+        text,
+        senderId,
+        toUid: receiverId,   // <--- IMPORTANTE
+        read: false,         // <--- IMPORTANTE
+        createdAt: Date.now()
+      });
 
-    // Actualizamos la fecha de última actividad del chat
-    await setDoc(doc(this.firestore, `chats/${roomId}`), { lastUpdate: Date.now() }, { merge: true });
+      // Actualizamos la fecha de última actividad y los participantes
+      await setDoc(doc(this.firestore, `chats/${roomId}`), { 
+        lastUpdate: Date.now(),
+        users: [senderId, receiverId] // Guardamos quiénes están en el chat
+      }, { merge: true });
+
+    } catch (error) {
+      console.error("Error enviando mensaje:", error);
+    }
   }
 }

@@ -9,14 +9,31 @@
   </div>
 
   <div class="chat-list" *ngIf="!loading && chats.length > 0">
-    <div class="chat-item" *ngFor="let chat of chats" (click)="openChat(chat.id)">
+    
+    <div 
+      class="chat-item" 
+      *ngFor="let chat of chats" 
+      (click)="openChat(chat.id)"
+      [class.has-unread]="chat.unreadCount > 0"
+    >
       <img [src]="chat.avatar" class="avatar">
+      
       <div class="info">
-        <h3>{{ chat.name }}</h3>
-        <p>{{ chat.lastMessage }}</p>
+        <div class="top-row">
+          <h3>{{ chat.name }}</h3>
+          </div>
+
+        <p *ngIf="chat.unreadCount === 0" class="msg-preview">{{ chat.lastMessage }}</p>
+        <p *ngIf="chat.unreadCount > 0" class="msg-unread">
+          ¡Tienes {{ chat.unreadCount }} mensajes nuevos!
+        </p>
       </div>
-      <div class="status" *ngIf="chat.unread">🔴</div>
+
+      <div class="unread-badge" *ngIf="chat.unreadCount > 0">
+        {{ chat.unreadCount }}
+      </div>
     </div>
+
   </div>
 
   <div class="empty-state" *ngIf="!loading && chats.length === 0">

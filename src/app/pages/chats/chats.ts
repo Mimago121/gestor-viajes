@@ -1,8 +1,11 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // <--- IMPORTAR ChangeDetectorRef
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router'; 
 import { AuthService } from '../../services/auth.service';
-import { Firestore, doc, getDoc, onSnapshot } from '@angular/fire/firestore';
+import { ChatService } from '../../services/chat.service'; // <--- IMPORTAR SERVICIO
+import { 
+  Firestore, doc, getDoc, onSnapshot, collection, query, where, getCountFromServer 
+} from '@angular/fire/firestore'; // <--- IMPORTAR getCountFromServer, query, where, collection
 import { Router } from '@angular/router';
 
 @Component({
@@ -15,8 +18,9 @@ import { Router } from '@angular/router';
 export class ChatsComponent implements OnInit {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
+  private chatService = inject(ChatService); // <--- INYECTAR SERVICIO
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); // <--- INYECTAR DETECTOR
+  private cdr = inject(ChangeDetectorRef);
 
   chats: any[] = [];
   loading = true;
@@ -29,7 +33,7 @@ export class ChatsComponent implements OnInit {
         this.loadChatsOptimized(user.uid);
       } else {
         this.loading = false;
-        this.cdr.detectChanges(); // <--- ACTUALIZAR
+        this.cdr.detectChanges();
       }
     });
   }
@@ -38,7 +42,6 @@ export class ChatsComponent implements OnInit {
     this.loading = true;
     const userDocRef = doc(this.firestore, `users/${uid}`);
     
-    // Escuchar cambios en tiempo real
     onSnapshot(userDocRef, async (docSnap) => {
       if (!docSnap.exists()) {
         this.loading = false;
@@ -52,16 +55,17 @@ export class ChatsComponent implements OnInit {
       if (!Array.isArray(friendIds) || friendIds.length === 0) {
         this.chats = [];
         this.loading = false;
-        this.cdr.detectChanges(); // <--- ACTUALIZAR
+        this.cdr.detectChanges();
         return;
       }
 
       try {
-        // Carga paralela de perfiles
+        // 1. Carga paralela de perfiles básicos
         const requests = friendIds.map(fid => getDoc(doc(this.firestore, `users/${fid}`)));
         const snapshots = await Promise.all(requests);
 
-        this.chats = snapshots
+        // 2. Mapeo inicial
+        const tempChats = snapshots
           .filter(snap => snap.exists())
           .map(snap => {
             const fData = snap.data();
@@ -70,15 +74,43 @@ export class ChatsComponent implements OnInit {
               name: fData['name'] || 'Usuario',
               avatar: fData['avatar'] || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
               lastMessage: 'Haz clic para chatear...', 
-              unread: false 
+              unreadCount: 0 // Empezamos en 0
             };
           });
+
+        // 3. CALCULAR MENSAJES SIN LEER (Consulta Real)
+        const chatPromises = tempChats.map(async (chat) => {
+          if (!this.currentUserUid) return chat;
+
+          // Obtenemos la ID de la sala
+          const roomId = this.chatService.getChatRoomId(this.currentUserUid, chat.id);
+          
+          // Consultamos: Mensajes en esa sala, para MÍ, sin leer
+          const msgsRef = collection(this.firestore, 'chats', roomId, 'messages');
+          const q = query(
+            msgsRef, 
+            where('toUid', '==', this.currentUserUid),
+            where('read', '==', false)
+          );
+
+          // getCountFromServer es muy rápido y barato
+          const snapshot = await getCountFromServer(q);
+          chat.unreadCount = snapshot.data().count;
+          
+          return chat;
+        });
+
+        // Esperamos a que se calculen todos los contadores
+        this.chats = await Promise.all(chatPromises);
+
+        // 4. Ordenar: Los que tienen mensajes sin leer primero
+        this.chats.sort((a, b) => b.unreadCount - a.unreadCount);
 
       } catch (error) {
         console.error("Error cargando chats:", error);
       } finally {
         this.loading = false;
-        this.cdr.detectChanges(); // <--- ¡AQUÍ ESTÁ LA CLAVE! FORZAR PINTADO
+        this.cdr.detectChanges();
       }
     });
   }

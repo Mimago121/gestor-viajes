@@ -1,30 +1,54 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">🌍 Travel Manager</a>
+    
+    <a class="navbar-brand" routerLink="/trips">
+      <img src="https://i.postimg.cc/rs3tFpVg/Trip-Share-logo.png" alt="TripShare Logo" class="brand-logo">
+      <span>TripShare</span>
+    </a>
 
-    <!-- Botón hamburguesa -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-      aria-controls="navbarNav"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
+    <button class="navbar-toggler" type="button" (click)="toggleMenu()">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Menú que se colapsa -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/profile">Profile</a></li>
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/trips">Trips</a></li>
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/expenses">Expenses</a></li>
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/memories">Memories</a></li>
-        <li class="nav-item"><a class="nav-link text-white" routerLink="/login">Log Out</a></li>
+    <div class="collapse navbar-collapse" [class.show]="!isMenuCollapsed">
+      
+      <ul class="navbar-nav mx-auto" *ngIf="currentUser">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/trips" routerLinkActive="active" (click)="closeMenu()">
+            ✈️ Mis Viajes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/friends" routerLinkActive="active" (click)="closeMenu()">
+            👥 Comunidad
+          </a>
+        </li>
+        <li class="nav-item position-relative"> <a class="nav-link" routerLink="/chats" routerLinkActive="active" (click)="closeMenu()">
+            💬 Mensajes
+            
+            <span *ngIf="unreadCount > 0" class="badge-notification">
+              {{ unreadCount > 99 ? '99+' : unreadCount }}
+            </span>
+
+          </a>
+        </li>
       </ul>
+
+      <div class="d-flex align-items-center gap-3 user-zone" *ngIf="currentUser">
+        
+        <a routerLink="/profile" class="profile-link" title="Ir a mi perfil" (click)="closeMenu()">
+          <img [src]="userAvatar" class="nav-avatar">
+        </a>
+
+        <button class="btn-logout" (click)="logout()">
+          Salir ↪
+        </button>
+      </div>
+
+      <div class="ms-auto" *ngIf="!currentUser">
+        <a routerLink="/login" class="nav-link text-white">Iniciar Sesión</a>
+      </div>
+
     </div>
   </div>
 </nav>
